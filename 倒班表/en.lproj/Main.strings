@@ -1,0 +1,75 @@
+
+/* Class = "UILabel"; text = "cell1"; ObjectID = "44i-lS-quU"; */
+"44i-lS-quU.text" = "cell1";
+
+/* Class = "UINavigationItem"; title = "倒班表"; ObjectID = "4lJ-0i-u3k"; */
+"4lJ-0i-u3k.title" = "倒班表";
+
+/* Class = "UILabel"; text = "结束时间"; ObjectID = "5Fi-eR-fFi"; */
+"5Fi-eR-fFi.text" = "结束时间";
+
+/* Class = "UILabel"; text = "Next Work: "; ObjectID = "Aib-Nb-sPH"; */
+"Aib-Nb-sPH.text" = "Next Work: ";
+
+/* Class = "UITabBarItem"; title = "倒班表"; ObjectID = "CI3-vd-rKQ"; */
+"CI3-vd-rKQ.title" = "倒班表";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Cr1-ET-7Bh"; */
+"Cr1-ET-7Bh.text" = "Detail";
+
+/* Class = "UITableViewController"; title = "Schedules"; ObjectID = "E3w-s2-55U"; */
+"E3w-s2-55U.title" = "Schedules";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "On9-gF-dgb"; */
+"On9-gF-dgb.text" = "Detail";
+
+/* Class = "UILabel"; text = "Schedule:"; ObjectID = "R6q-IX-w59"; */
+"R6q-IX-w59.text" = "Schedule:";
+
+/* Class = "UINavigationItem"; title = "新班种"; ObjectID = "WFF-9R-CBP"; */
+"WFF-9R-CBP.title" = "新班种";
+
+/* Class = "UILabel"; text = "Today:"; ObjectID = "Y5L-km-0YF"; */
+"Y5L-km-0YF.text" = "Today:";
+
+/* Class = "UINavigationItem"; title = "管理班种"; ObjectID = "ZYO-zf-Vx1"; */
+"ZYO-zf-Vx1.title" = "管理班种";
+
+/* Class = "UITabBarItem"; title = "Now"; ObjectID = "acW-dT-cKf"; */
+"acW-dT-cKf.title" = "Now";
+
+/* Class = "UITableViewSection"; headerTitle = "时间"; ObjectID = "bXa-XF-aeF"; */
+"bXa-XF-aeF.headerTitle" = "时间";
+
+/* Class = "UITextField"; placeholder = "白班"; ObjectID = "cMl-LQ-BGj"; */
+"cMl-LQ-BGj.placeholder" = "白班";
+
+/* Class = "UITableViewController"; title = "WorkManagement"; ObjectID = "hsG-BC-3E3"; */
+"hsG-BC-3E3.title" = "WorkManagement";
+
+/* Class = "UILabel"; text = "SCHEDULE_NAME"; ObjectID = "jZb-l4-d4m"; */
+"jZb-l4-d4m.text" = "SCHEDULE_NAME";
+
+/* Class = "UITableViewSection"; headerTitle = "班名"; ObjectID = "kHK-sX-dGv"; */
+"kHK-sX-dGv.headerTitle" = "班名";
+
+/* Class = "UILabel"; text = "开始时间"; ObjectID = "mDm-D3-LAF"; */
+"mDm-D3-LAF.text" = "开始时间";
+
+/* Class = "UILabel"; text = "TIME_REMAIN"; ObjectID = "olg-QA-pYq"; */
+"olg-QA-pYq.text" = "TIME_REMAIN";
+
+/* Class = "UILabel"; text = "cell1"; ObjectID = "rA8-nD-Gd0"; */
+"rA8-nD-Gd0.text" = "cell1";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "tem-0J-lVS"; */
+"tem-0J-lVS.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "持续时间"; ObjectID = "yCD-R5-0kD"; */
+"yCD-R5-0kD.text" = "持续时间";
+
+/* Class = "UILabel"; text = "DATE"; ObjectID = "yWH-my-ZMQ"; */
+"yWH-my-ZMQ.text" = "DATE";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "zwC-f0-KN5"; */
+"zwC-f0-KN5.text" = "Detail";
