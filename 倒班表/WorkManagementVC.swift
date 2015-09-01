@@ -10,15 +10,19 @@ import UIKit
 
 class WorkManagementVC: UITableViewController {
     //MARK: - properties
-    var works = [Part]();
+    var works: WorksLib!;
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
         ret.timeStyle = .ShortStyle;
         return ret;}()
+    
+    //MARKS: - VCs
     override func viewDidLoad() {
         super.viewDidLoad()
+        /*
         works.append(Part(name: "Day", beginDate: NSDate(timeIntervalSinceReferenceDate: 10), endDate: NSDate(timeIntervalSinceReferenceDate: 400)));
-        works.append(Part(name: "Night", beginDate: NSDate(timeIntervalSinceReferenceDate: 10000), endDate: NSDate(timeIntervalSinceReferenceDate: 10400)));        // Uncomment the following line to preserve selection between presentations
+        works.append(Part(name: "Night", beginDate: NSDate(timeIntervalSinceReferenceDate: 10000), endDate: NSDate(timeIntervalSinceReferenceDate: 10400)));*/
+        // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
@@ -29,6 +33,11 @@ class WorkManagementVC: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    required init (coder aDecoder: NSCoder){
+        super.init(coder: aDecoder)    
+    }
+    // MARK: - utilities
+
 
     // MARK: - Table view data source
 
@@ -41,7 +50,7 @@ class WorkManagementVC: UITableViewController {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
-        return works.count;
+        return works.lib.count;
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -49,8 +58,8 @@ class WorkManagementVC: UITableViewController {
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("WorkCell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel!.text = works[indexPath.row].title;
-        let work = works[indexPath.row];
+        cell.textLabel!.text = works.lib[indexPath.row].title;
+        let work = works.lib[indexPath.row];
         cell.detailTextLabel!.text = String(format: "%@ ~ %@",
                                             formatter.stringFromDate(work.beginDate),
                                             formatter.stringFromDate(work.endDate),
@@ -67,17 +76,14 @@ class WorkManagementVC: UITableViewController {
     }
     */
 
-    /*
-    // Override to support editing the table view.
+    
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
+            works.lib.removeAtIndex(indexPath.row);
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-    */
+    
 
     /*
     // Override to support rearranging the table view.
@@ -108,7 +114,7 @@ class WorkManagementVC: UITableViewController {
             let cont = dest.topViewController as! NewWorkVC;
             cont.delegate = self
             let id = sender as! NSIndexPath;
-            cont.workToEdit = works[id.row];
+            cont.workToEdit = works.lib[id.row];
         }
         super.prepareForSegue(segue, sender: sender)
     }
@@ -119,13 +125,13 @@ class WorkManagementVC: UITableViewController {
 
 extension WorkManagementVC: NewWorkVCDelegate{
     func appendNewWork(work: Part) {
-        works.append(work)
+        works.lib.append(work)
         tableView.reloadData();
         println("work inserted!")
     }
     func editWork(work: Part) {
-        if let id = find(works, work){
-            works[id] = work;
+        if let id = find(works.lib, work){
+            works.lib[id] = work;
             tableView.reloadData();
             println("work modified! \(work)");
         }else{

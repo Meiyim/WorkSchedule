@@ -10,7 +10,7 @@ import UIKit
 
 class SchedulesVC: UITableViewController {
     // MARK: - properties
-    var schedules = [Schedule]();
+    var dataLib: DataLib!;
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -63,7 +63,6 @@ class SchedulesVC: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 && indexPath.section == 0 {
             performSegueWithIdentifier("ShowWorkManagement", sender: tableView.cellForRowAtIndexPath(indexPath))
-        }else{
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
     }
@@ -104,14 +103,25 @@ class SchedulesVC: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "ShowWorkManagement" {
+            let controller = segue.destinationViewController as! WorkManagementVC
+            controller.works = self.dataLib.worksLib;
+            
+        } else if segue.identifier == "ShowNewSchedule" {
+            let controller = segue.destinationViewController as! NewScheduleVC;
+            if let id = sender as? NSIndexPath{
+                controller.worksLib = dataLib.worksLib;
+                controller.scheduleToEdit = dataLib.scheduleLib[id.row];
+            }else{
+                controller.worksLib = dataLib.worksLib;
+            }
+        }
     }
-    */
+    
 
 }

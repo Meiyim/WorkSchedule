@@ -62,6 +62,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
+                                <size key="shadowOffset" width="0.0" height="0.0"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -115,7 +116,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="倒班表" id="4lJ-0i-u3k">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="3xR-I1-ydy"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="3xR-I1-ydy">
+                            <connections>
+                                <segue destination="qcf-Bb-zLO" kind="presentation" identifier="ShowNewSchedule" id="ABK-oq-orh"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <segue destination="hsG-BC-3E3" kind="show" identifier="ShowWorkManagement" id="ayN-Wt-H8P"/>
@@ -142,7 +147,7 @@
                                         <label opaque="NO" multipleTouchEnabled="YES" tag="100" contentMode="left" text="cell1" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="rA8-nD-Gd0">
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tem-0J-lVS">
@@ -174,16 +179,124 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mm7-bi-D9m" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2166" y="387"/>
+            <point key="canvasLocation" x="2294" y="75"/>
+        </scene>
+        <!--New ScheduleVC-->
+        <scene sceneID="6c6-cW-faU">
+            <objects>
+                <viewController id="qcf-Bb-zLO" customClass="NewScheduleVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="zM3-tV-AGh"/>
+                        <viewControllerLayoutGuide type="bottom" id="bo8-9q-xCo"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="r55-Zc-7Ri">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="DWV-Z2-8L2">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="qcf-Bb-zLO" id="CEF-Ok-nKg"/>
+                                    <outlet property="delegate" destination="qcf-Bb-zLO" id="Vqh-3i-Wha"/>
+                                </connections>
+                            </tableView>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hDk-vq-6uW">
+                                <rect key="frame" x="0.0" y="20" width="600" height="44"/>
+                                <items>
+                                    <navigationItem title="新倒班周期" id="Akt-5S-fFB">
+                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Fcx-Zu-Y0b">
+                                            <connections>
+                                                <action selector="cancel:" destination="qcf-Bb-zLO" id="VFB-hs-fWc"/>
+                                            </connections>
+                                        </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="EbQ-uZ-l6M"/>
+                                    </navigationItem>
+                                </items>
+                                <connections>
+                                    <outlet property="delegate" destination="qcf-Bb-zLO" id="O95-AL-LIt"/>
+                                </connections>
+                            </navigationBar>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fbW-ve-36a" userLabel="riseUpView" customClass="RiseUpView" customModule="倒班表" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="556" width="600" height="220"/>
+                                <subviews>
+                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzH-Sz-VQZ">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                        <items>
+                                            <barButtonItem width="300" systemItem="trash" id="E88-lw-gLF"/>
+                                            <barButtonItem title="应用倒班周期" id="Mkg-R5-7eh"/>
+                                            <barButtonItem systemItem="add" id="3IH-Vs-mhb">
+                                                <connections>
+                                                    <action selector="moveRiseUpView:" destination="qcf-Bb-zLO" id="pPq-WN-kga"/>
+                                                </connections>
+                                            </barButtonItem>
+                                        </items>
+                                    </toolbar>
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="yJ7-Cr-Xm2">
+                                        <rect key="frame" x="0.0" y="44" width="600" height="176"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="176" id="W6a-gs-y3b"/>
+                                        </constraints>
+                                        <color key="sectionIndexBackgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        <connections>
+                                            <outlet property="dataSource" destination="fbW-ve-36a" id="hxZ-Ml-fRb"/>
+                                            <outlet property="delegate" destination="fbW-ve-36a" id="6rv-wr-DBo"/>
+                                        </connections>
+                                    </tableView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="yJ7-Cr-Xm2" firstAttribute="top" secondItem="MzH-Sz-VQZ" secondAttribute="bottom" id="I2z-hV-U3L"/>
+                                    <constraint firstAttribute="bottom" secondItem="yJ7-Cr-Xm2" secondAttribute="bottom" id="OP8-7t-st8"/>
+                                    <constraint firstItem="MzH-Sz-VQZ" firstAttribute="leading" secondItem="fbW-ve-36a" secondAttribute="leading" id="f1S-an-uym"/>
+                                    <constraint firstAttribute="trailing" secondItem="yJ7-Cr-Xm2" secondAttribute="trailing" id="nbI-kr-lBA"/>
+                                    <constraint firstAttribute="trailing" secondItem="MzH-Sz-VQZ" secondAttribute="trailing" id="ncW-s6-4wY"/>
+                                    <constraint firstItem="yJ7-Cr-Xm2" firstAttribute="leading" secondItem="fbW-ve-36a" secondAttribute="leading" id="pg0-Y6-2hr"/>
+                                    <constraint firstItem="MzH-Sz-VQZ" firstAttribute="top" secondItem="fbW-ve-36a" secondAttribute="top" id="rch-eF-Igl"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="riseUpTableView" destination="yJ7-Cr-Xm2" id="Kpu-Tc-IPe"/>
+                                </connections>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="hDk-vq-6uW" firstAttribute="top" secondItem="zM3-tV-AGh" secondAttribute="bottom" id="4aq-2W-HKe"/>
+                            <constraint firstItem="DWV-Z2-8L2" firstAttribute="top" secondItem="r55-Zc-7Ri" secondAttribute="top" id="Kft-aZ-kIm"/>
+                            <constraint firstAttribute="trailing" secondItem="fbW-ve-36a" secondAttribute="trailing" id="Ofo-Mu-tsi"/>
+                            <constraint firstAttribute="trailing" secondItem="DWV-Z2-8L2" secondAttribute="trailing" id="RJr-Rd-vVu"/>
+                            <constraint firstItem="DWV-Z2-8L2" firstAttribute="leading" secondItem="r55-Zc-7Ri" secondAttribute="leading" id="XZt-pE-oam"/>
+                            <constraint firstAttribute="trailing" secondItem="hDk-vq-6uW" secondAttribute="trailing" id="a2f-Hh-fh7"/>
+                            <constraint firstItem="bo8-9q-xCo" firstAttribute="top" secondItem="fbW-ve-36a" secondAttribute="top" constant="44" id="b5s-Ma-uaM"/>
+                            <constraint firstItem="bo8-9q-xCo" firstAttribute="top" secondItem="DWV-Z2-8L2" secondAttribute="bottom" id="b9j-6a-Ahz"/>
+                            <constraint firstItem="fbW-ve-36a" firstAttribute="leading" secondItem="r55-Zc-7Ri" secondAttribute="leading" id="fvr-58-PKW"/>
+                            <constraint firstItem="hDk-vq-6uW" firstAttribute="leading" secondItem="r55-Zc-7Ri" secondAttribute="leading" id="qC9-xt-wUR"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="applyButton" destination="Mkg-R5-7eh" id="cgG-IP-BSU"/>
+                        <outlet property="doneButton" destination="EbQ-uZ-l6M" id="6bT-Ga-kzK"/>
+                        <outlet property="navigationBar" destination="hDk-vq-6uW" id="MmH-dl-yZ3"/>
+                        <outlet property="riseButton" destination="3IH-Vs-mhb" id="cjc-rb-RyS"/>
+                        <outlet property="riseUpTableView" destination="yJ7-Cr-Xm2" id="oPq-cx-eql"/>
+                        <outlet property="riseUpView" destination="fbW-ve-36a" id="HDL-hE-mN0"/>
+                        <outlet property="tableView" destination="DWV-Z2-8L2" id="rSt-Vt-v1g"/>
+                        <outlet property="toolBar" destination="MzH-Sz-VQZ" id="mH1-4q-X94"/>
+                        <outlet property="trashButton" destination="E88-lw-gLF" id="P3m-7n-Rz5"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4Sf-QH-xbO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2294" y="806"/>
         </scene>
         <!--新班种-->
         <scene sceneID="372-Yb-NqT">
             <objects>
                 <tableViewController id="8dh-dN-MCq" customClass="NewWorkVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="tkX-Ye-V7D">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="tkX-Ye-V7D">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <sections>
                             <tableViewSection headerTitle="班名" id="kHK-sX-dGv">
                                 <cells>
@@ -328,7 +441,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vFh-kQ-F4W" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3646" y="380"/>
+            <point key="canvasLocation" x="3844" y="75"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
@@ -384,7 +497,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1kz-7g-5uP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3012" y="387"/>
+            <point key="canvasLocation" x="3140" y="75"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
