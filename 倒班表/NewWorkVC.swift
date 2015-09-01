@@ -22,12 +22,14 @@ class NewWorkVC: UITableViewController {
         didSet{
             beginTimeLabel.text = formatter.stringFromDate(beginDate!);
             lastTimeLabel.text = lastTime?.formattedString;
+            validateDoneButton();
         }
     }
     var endDate: NSDate? {
         didSet{
             endTimeLabel.text = formatter.stringFromDate(endDate!);
             lastTimeLabel.text = lastTime?.formattedString;
+            validateDoneButton();
         }
     }
     var lastTime: NSTimeInterval? {
@@ -244,6 +246,13 @@ class NewWorkVC: UITableViewController {
     }
     */
     // MARK: - utilities
+    func validateDoneButton(){
+        if(textField.text.isEmpty) || beginDate == nil || endDate == nil {
+            doneButton.enabled = false;
+        }else{
+            doneButton.enabled = true;
+        }
+    }
     func showTimePickerForRow(row: Int){
         timePickerRow = row + 1;
         let insertID = NSIndexPath(forRow: row + 1, inSection: 1)
@@ -296,7 +305,7 @@ extension NewWorkVC: UITextFieldDelegate{
         let oldText: NSString = textField.text
         let newText: NSString = oldText.stringByReplacingCharactersInRange(range, withString: string)
         if newText.length > 0 {
-            doneButton.enabled = true;
+            validateDoneButton();
         }else{
             doneButton.enabled = false;
         }

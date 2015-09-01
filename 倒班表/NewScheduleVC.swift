@@ -95,6 +95,7 @@ class NewScheduleVC: UIViewController {
         }
         riseUpView.worksLib = worksLib;
         riseUpView.delegate = self;
+        tableView.setEditing(true, animated: true);
     }
     /*
     // MARK: - Navigation
@@ -108,7 +109,17 @@ class NewScheduleVC: UIViewController {
 
 }
 extension NewScheduleVC :UITableViewDelegate{
+    // Override to support conditional editing of the table view.
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        // Return NO if you do not want the specified item to be editable.
+        return true
+    }
     
+    // Override to support conditional rearranging of the table view.
+    func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        // Return NO if you do not want the item to be re-orderable.
+        return true
+    }
 }
 extension NewScheduleVC :UITableViewDataSource{
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -127,6 +138,29 @@ extension NewScheduleVC :UITableViewDataSource{
         cell.detailTextLabel?.text = "hola";
         return cell;
     }
+    
+    
+     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            scheduleToEdit.parts.removeAtIndex(indexPath.row)
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade);
+        }
+    }
+    
+    
+    
+    // Override to support rearranging the table view.
+    func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+        
+        let toID = toIndexPath.row;
+        let fromID = fromIndexPath.row;
+        
+        let work = scheduleToEdit.parts[fromID];
+        scheduleToEdit.parts.removeAtIndex(fromID);
+        scheduleToEdit.parts.insert(work, atIndex: toID);
+        println(toID,fromID);
+    }
+    
 }
 
 extension NewScheduleVC: UINavigationBarDelegate{ //deal with the status bar
@@ -145,6 +179,9 @@ extension NewScheduleVC: UIGestureRecognizerDelegate{
         }
         
     }
+    
+
+
 }
 
 extension NewScheduleVC: RiseUpViewDelegate {
@@ -156,4 +193,6 @@ extension NewScheduleVC: RiseUpViewDelegate {
         tableView.insertRowsAtIndexPaths([idToInsert], withRowAnimation: .Fade)
         println("shoudld insert row at \(idToInsert.row)");
     }
+
+    
 }
