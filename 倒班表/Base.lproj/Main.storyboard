@@ -89,10 +89,10 @@
         <scene sceneID="2nd-F9-INS">
             <objects>
                 <tableViewController title="Schedules" id="E3w-s2-55U" customClass="SchedulesVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="nce-RW-Ys3">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="nce-RW-Ys3">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ScheduleCell" textLabel="44i-lS-quU" style="IBUITableViewCellStyleDefault" id="sjf-5T-dC0">
                                 <autoresizingMask key="autoresizingMask"/>
@@ -118,7 +118,7 @@
                     <navigationItem key="navigationItem" title="倒班表" id="4lJ-0i-u3k">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="3xR-I1-ydy">
                             <connections>
-                                <segue destination="qcf-Bb-zLO" kind="presentation" identifier="ShowNewSchedule" id="ABK-oq-orh"/>
+                                <segue destination="W75-sj-r21" kind="presentation" identifier="ShowNewSchedule" id="xc6-SI-AC4"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -181,10 +181,10 @@
             </objects>
             <point key="canvasLocation" x="2294" y="75"/>
         </scene>
-        <!--New ScheduleVC-->
+        <!--Cycle ManagementVC-->
         <scene sceneID="6c6-cW-faU">
             <objects>
-                <viewController id="qcf-Bb-zLO" customClass="NewScheduleVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="qcf-Bb-zLO" customClass="CycleManagementVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="zM3-tV-AGh"/>
                         <viewControllerLayoutGuide type="bottom" id="bo8-9q-xCo"/>
@@ -201,22 +201,6 @@
                                     <outlet property="delegate" destination="qcf-Bb-zLO" id="Vqh-3i-Wha"/>
                                 </connections>
                             </tableView>
-                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hDk-vq-6uW">
-                                <rect key="frame" x="0.0" y="20" width="600" height="44"/>
-                                <items>
-                                    <navigationItem title="新倒班周期" id="Akt-5S-fFB">
-                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Fcx-Zu-Y0b">
-                                            <connections>
-                                                <action selector="cancel:" destination="qcf-Bb-zLO" id="VFB-hs-fWc"/>
-                                            </connections>
-                                        </barButtonItem>
-                                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="EbQ-uZ-l6M"/>
-                                    </navigationItem>
-                                </items>
-                                <connections>
-                                    <outlet property="delegate" destination="qcf-Bb-zLO" id="O95-AL-LIt"/>
-                                </connections>
-                            </navigationBar>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fbW-ve-36a" userLabel="riseUpView" customClass="RiseUpView" customModule="倒班表" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="556" width="600" height="220"/>
                                 <subviews>
@@ -261,22 +245,17 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="hDk-vq-6uW" firstAttribute="top" secondItem="zM3-tV-AGh" secondAttribute="bottom" id="4aq-2W-HKe"/>
                             <constraint firstItem="DWV-Z2-8L2" firstAttribute="top" secondItem="r55-Zc-7Ri" secondAttribute="top" id="Kft-aZ-kIm"/>
                             <constraint firstAttribute="trailing" secondItem="fbW-ve-36a" secondAttribute="trailing" id="Ofo-Mu-tsi"/>
                             <constraint firstAttribute="trailing" secondItem="DWV-Z2-8L2" secondAttribute="trailing" id="RJr-Rd-vVu"/>
                             <constraint firstItem="DWV-Z2-8L2" firstAttribute="leading" secondItem="r55-Zc-7Ri" secondAttribute="leading" id="XZt-pE-oam"/>
-                            <constraint firstAttribute="trailing" secondItem="hDk-vq-6uW" secondAttribute="trailing" id="a2f-Hh-fh7"/>
                             <constraint firstItem="bo8-9q-xCo" firstAttribute="top" secondItem="fbW-ve-36a" secondAttribute="top" constant="44" id="b5s-Ma-uaM"/>
                             <constraint firstItem="bo8-9q-xCo" firstAttribute="top" secondItem="DWV-Z2-8L2" secondAttribute="bottom" id="b9j-6a-Ahz"/>
                             <constraint firstItem="fbW-ve-36a" firstAttribute="leading" secondItem="r55-Zc-7Ri" secondAttribute="leading" id="fvr-58-PKW"/>
-                            <constraint firstItem="hDk-vq-6uW" firstAttribute="leading" secondItem="r55-Zc-7Ri" secondAttribute="leading" id="qC9-xt-wUR"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="applyButton" destination="Mkg-R5-7eh" id="cgG-IP-BSU"/>
-                        <outlet property="doneButton" destination="EbQ-uZ-l6M" id="6bT-Ga-kzK"/>
-                        <outlet property="navigationBar" destination="hDk-vq-6uW" id="MmH-dl-yZ3"/>
                         <outlet property="riseButton" destination="3IH-Vs-mhb" id="cjc-rb-RyS"/>
                         <outlet property="riseUpTableView" destination="yJ7-Cr-Xm2" id="oPq-cx-eql"/>
                         <outlet property="riseUpView" destination="fbW-ve-36a" id="HDL-hE-mN0"/>
@@ -287,7 +266,164 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Sf-QH-xbO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2294" y="806"/>
+            <point key="canvasLocation" x="3844" y="804"/>
+        </scene>
+        <!--Schedule ManagementVC-->
+        <scene sceneID="gDP-Y1-w4k">
+            <objects>
+                <tableViewController id="0lg-pj-OS2" customClass="ScheduleManagementVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="lhf-Cg-FAy">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
+                        <sections>
+                            <tableViewSection headerTitle="名字" id="EnP-Md-qRQ">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="qmw-g2-y1g">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qmw-g2-y1g" id="HP8-In-iK2">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="新倒班周期" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="cJm-ne-qXG">
+                                                    <rect key="frame" x="8" y="5" width="584" height="33"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
+                                                    <connections>
+                                                        <outlet property="delegate" destination="0lg-pj-OS2" id="Ovb-fo-7LI"/>
+                                                    </connections>
+                                                </textField>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="bottomMargin" secondItem="cJm-ne-qXG" secondAttribute="bottom" constant="-3" id="DFu-lY-7W5"/>
+                                                <constraint firstItem="cJm-ne-qXG" firstAttribute="leading" secondItem="HP8-In-iK2" secondAttribute="leadingMargin" id="Gvy-z5-QcX"/>
+                                                <constraint firstItem="cJm-ne-qXG" firstAttribute="top" secondItem="HP8-In-iK2" secondAttribute="topMargin" constant="-3" id="Pki-hK-MDp"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="cJm-ne-qXG" secondAttribute="trailing" id="m1E-7j-458"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="必要的配置" id="zPI-T5-byb">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="H4h-Mh-A6s" style="IBUITableViewCellStyleDefault" id="nUX-VR-ddE">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nUX-VR-ddE" id="fpm-cd-xaa">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="H4h-Mh-A6s">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="ROG-sx-GY6" style="IBUITableViewCellStyleDefault" id="EL0-ab-Z1T">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="EL0-ab-Z1T" id="sIJ-BK-M9T">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ROG-sx-GY6">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="W2G-7h-3Se" style="IBUITableViewCellStyleDefault" id="9b9-y7-yOl">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9b9-y7-yOl" id="NGf-wb-8Gt">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="W2G-7h-3Se">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="倒班周期图" id="7ki-8y-Rsp">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" rowHeight="132" id="wni-a1-H1g">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wni-a1-H1g" id="tsk-pF-ueg">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="qcf-Bb-zLO" kind="show" identifier="showEditCycle" id="QvD-2f-1wA"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection id="XXb-f0-nmZ">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="cjg-q0-IhR">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cjg-q0-IhR" id="MTA-zm-et9">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" tag="101" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="应用此倒班周期" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jlk-xV-agb">
+                                                    <rect key="frame" x="241" y="11" width="119" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerY" secondItem="jlk-xV-agb" secondAttribute="centerY" id="C8l-hi-g1D"/>
+                                                <constraint firstAttribute="centerX" secondItem="jlk-xV-agb" secondAttribute="centerX" id="cFL-j8-Z2J"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="7fE-Ri-yVI">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7fE-Ri-yVI" id="CxR-WG-N3h">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="删除..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3YC-rq-SKg">
+                                                    <rect key="frame" x="276" y="11" width="49" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerY" secondItem="3YC-rq-SKg" secondAttribute="centerY" id="FWM-LF-fD8"/>
+                                                <constraint firstAttribute="centerX" secondItem="3YC-rq-SKg" secondAttribute="centerX" id="hsz-f5-xsj"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="0lg-pj-OS2" id="5WX-dW-7UJ"/>
+                            <outlet property="delegate" destination="0lg-pj-OS2" id="6dn-YB-jjg"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="LIK-MN-ALx">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="cuY-m5-R8E">
+                            <connections>
+                                <action selector="cancel:" destination="0lg-pj-OS2" id="NpU-JZ-AYG"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="done" id="r79-qp-An1"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="applyButton" destination="jlk-xV-agb" id="zxw-8Q-Ozd"/>
+                        <outlet property="doneButton" destination="r79-qp-An1" id="VfJ-nd-Ec6"/>
+                        <outlet property="textField" destination="cJm-ne-qXG" id="wg9-bS-WZB"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HmE-8z-CN8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3140" y="804"/>
         </scene>
         <!--新班种-->
         <scene sceneID="372-Yb-NqT">
@@ -498,6 +634,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1kz-7g-5uP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3140" y="75"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="RYc-47-NWT">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="W75-sj-r21" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="9t5-eZ-wtm">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="0lg-pj-OS2" kind="relationship" relationship="rootViewController" id="sau-Q7-QE1"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Rfr-N2-M19" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2294" y="804"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

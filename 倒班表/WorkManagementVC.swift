@@ -61,9 +61,7 @@ class WorkManagementVC: UITableViewController {
         cell.textLabel!.text = works.lib[indexPath.row].title;
         let work = works.lib[indexPath.row];
         cell.detailTextLabel!.text = String(format: "%@ ~ %@",
-                                            formatter.stringFromDate(work.beginDate),
-                                            formatter.stringFromDate(work.endDate),
-                                            work.last.formattedString )
+                                            work.begin.formattedString,work.end.formattedString )
         return cell
     }
     

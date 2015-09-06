@@ -1,0 +1,126 @@
+//
+//  ScheduleManagementVCTableViewController.swift
+//  倒班表
+//
+//  Created by 陈徐屹 on 15/9/5.
+//  Copyright (c) 2015年 陈徐屹. All rights reserved.
+//
+
+import UIKit
+
+class ScheduleManagementVC: UITableViewController {
+    // MARK: - properties
+    var scheduleToEdit: Schedule!;
+    var worksLib: WorksLib!;
+    // MARK: - Outlets
+    @IBOutlet weak var applyButton: UILabel!
+    @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var doneButton: UIBarButtonItem!
+    //MARK: - Action
+    @IBAction func cancel(sender: AnyObject) {
+        dismissViewControllerAnimated(true, completion: nil);
+    }
+    //MARK: - Views;
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        applyButton.textColor = applyButton.tintColor;
+        textField.becomeFirstResponder();
+        if scheduleToEdit.title == "" {
+            navigationItem.title = "新建倒班周期"
+        }else{
+            navigationItem.title = scheduleToEdit.title;
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+    // MARK: - Table view data source
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        tableView.deselectRowAtIndexPath(indexPath, animated: true);
+        if(indexPath.section != 0 ){
+            textField.resignFirstResponder();
+        }
+    }
+
+    /*
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath) as! UITableViewCell
+
+        // Configure the cell...
+
+        return cell
+    }
+    */
+
+    /*
+    // Override to support conditional editing of the table view.
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        // Return NO if you do not want the specified item to be editable.
+        return true
+    }
+    */
+
+    /*
+    // Override to support editing the table view.
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            // Delete the row from the data source
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+        } else if editingStyle == .Insert {
+            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+        }    
+    }
+    */
+
+    /*
+    // Override to support rearranging the table view.
+    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+
+    }
+    */
+
+    /*
+    // Override to support conditional rearranging of the table view.
+    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        // Return NO if you do not want the item to be re-orderable.
+        return true
+    }
+    */
+
+    
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "showEditCycle" {
+            let controller = segue.destinationViewController as! CycleManagementVC;
+            controller.worksLib = self.worksLib
+            controller.scheduleToEdit = self.scheduleToEdit;
+        }
+    }
+    //MARK: - Utilities
+    private func validateDoneButton(){
+        if(true){
+            doneButton.enabled = true;
+        }else{
+            //doneButton.enabled = false;
+        }
+    }
+
+}
+
+extension ScheduleManagementVC: UITextFieldDelegate{
+    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+        let oldText: NSString = textField.text
+        let newText: NSString = oldText.stringByReplacingCharactersInRange(range, withString: string)
+        if newText.length > 0 {
+            validateDoneButton();
+        }else{
+            doneButton.enabled = false;
+        }
+        return true;
+    }
+}

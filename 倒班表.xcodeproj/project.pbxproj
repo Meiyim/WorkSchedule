@@ -7,13 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B71F8B31B9C4D900025DAE4 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B71F8B21B9C4D900025DAE4 /* extensions.swift */; };
 		6B7E64411B9075C000C3B005 /* RiseUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7E64401B9075C000C3B005 /* RiseUpVC.swift */; };
 		6BBD16971B842959006E980C /* SchedulesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD16961B842959006E980C /* SchedulesVC.swift */; };
 		6BBD169B1B8429F7006E980C /* NowVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD169A1B8429F7006E980C /* NowVC.swift */; };
 		6BBD169D1B842A11006E980C /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD169C1B842A11006E980C /* Schedule.swift */; };
 		6BBD169F1B85C7D7006E980C /* WorkManagementVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD169E1B85C7D7006E980C /* WorkManagementVC.swift */; };
 		6BBD16A11B85D480006E980C /* NewWorkVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD16A01B85D480006E980C /* NewWorkVC.swift */; };
-		6BBD72421B8C6F2200FB1520 /* NewScheduleVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD72411B8C6F2200FB1520 /* NewScheduleVC.swift */; };
+		6BBD72421B8C6F2200FB1520 /* CycleManagementVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD72411B8C6F2200FB1520 /* CycleManagementVC.swift */; };
+		6BE592461B9A891300E84975 /* ScheduleManagementVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE592451B9A891300E84975 /* ScheduleManagementVC.swift */; };
 		6BFB36C11B83305C002198F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFB36C01B83305C002198F6 /* AppDelegate.swift */; };
 		6BFB36C81B83305C002198F6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6BFB36C61B83305C002198F6 /* Main.storyboard */; };
 		6BFB36CA1B83305C002198F6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6BFB36C91B83305C002198F6 /* Images.xcassets */; };
@@ -33,13 +35,15 @@
 
 /* Begin PBXFileReference section */
 		6B4165621B86C49C00AE4F5F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		6B71F8B21B9C4D900025DAE4 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		6B7E64401B9075C000C3B005 /* RiseUpVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RiseUpVC.swift; sourceTree = "<group>"; };
 		6BBD16961B842959006E980C /* SchedulesVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchedulesVC.swift; sourceTree = "<group>"; };
 		6BBD169A1B8429F7006E980C /* NowVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowVC.swift; sourceTree = "<group>"; };
 		6BBD169C1B842A11006E980C /* Schedule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		6BBD169E1B85C7D7006E980C /* WorkManagementVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkManagementVC.swift; sourceTree = "<group>"; };
 		6BBD16A01B85D480006E980C /* NewWorkVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewWorkVC.swift; sourceTree = "<group>"; };
-		6BBD72411B8C6F2200FB1520 /* NewScheduleVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewScheduleVC.swift; sourceTree = "<group>"; };
+		6BBD72411B8C6F2200FB1520 /* CycleManagementVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CycleManagementVC.swift; sourceTree = "<group>"; };
+		6BE592451B9A891300E84975 /* ScheduleManagementVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScheduleManagementVC.swift; sourceTree = "<group>"; };
 		6BFB36BB1B83305C002198F6 /* 倒班表.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "倒班表.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BFB36BF1B83305C002198F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BFB36C01B83305C002198F6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -95,12 +99,14 @@
 				6BFB36C91B83305C002198F6 /* Images.xcassets */,
 				6BFB36CB1B83305C002198F6 /* LaunchScreen.xib */,
 				6BBD169C1B842A11006E980C /* Schedule.swift */,
+				6B71F8B21B9C4D900025DAE4 /* extensions.swift */,
 				6BFB36BE1B83305C002198F6 /* Supporting Files */,
 				6BBD16961B842959006E980C /* SchedulesVC.swift */,
 				6BBD169A1B8429F7006E980C /* NowVC.swift */,
 				6BBD169E1B85C7D7006E980C /* WorkManagementVC.swift */,
 				6BBD16A01B85D480006E980C /* NewWorkVC.swift */,
-				6BBD72411B8C6F2200FB1520 /* NewScheduleVC.swift */,
+				6BE592451B9A891300E84975 /* ScheduleManagementVC.swift */,
+				6BBD72411B8C6F2200FB1520 /* CycleManagementVC.swift */,
 				6B7E64401B9075C000C3B005 /* RiseUpVC.swift */,
 			);
 			path = "倒班表";
@@ -231,11 +237,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6BBD72421B8C6F2200FB1520 /* NewScheduleVC.swift in Sources */,
+				6BBD72421B8C6F2200FB1520 /* CycleManagementVC.swift in Sources */,
 				6BBD169F1B85C7D7006E980C /* WorkManagementVC.swift in Sources */,
 				6B7E64411B9075C000C3B005 /* RiseUpVC.swift in Sources */,
 				6BBD169D1B842A11006E980C /* Schedule.swift in Sources */,
 				6BBD16A11B85D480006E980C /* NewWorkVC.swift in Sources */,
+				6B71F8B31B9C4D900025DAE4 /* extensions.swift in Sources */,
+				6BE592461B9A891300E84975 /* ScheduleManagementVC.swift in Sources */,
 				6BBD16971B842959006E980C /* SchedulesVC.swift in Sources */,
 				6BFB36C11B83305C002198F6 /* AppDelegate.swift in Sources */,
 				6BBD169B1B8429F7006E980C /* NowVC.swift in Sources */,

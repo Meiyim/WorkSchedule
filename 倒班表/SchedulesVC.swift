@@ -63,6 +63,8 @@ class SchedulesVC: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 && indexPath.section == 0 {
             performSegueWithIdentifier("ShowWorkManagement", sender: tableView.cellForRowAtIndexPath(indexPath))
+        }else{
+            performSegueWithIdentifier("ShowNewSchedule", sender: tableView.cellForRowAtIndexPath(indexPath))
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
     }
@@ -113,12 +115,16 @@ class SchedulesVC: UITableViewController {
             controller.works = self.dataLib.worksLib;
             
         } else if segue.identifier == "ShowNewSchedule" {
-            let controller = segue.destinationViewController as! NewScheduleVC;
+            let navi = segue.destinationViewController as! UINavigationController;
+            let controller = navi.topViewController as! ScheduleManagementVC
             if let id = sender as? NSIndexPath{
                 controller.worksLib = dataLib.worksLib;
                 controller.scheduleToEdit = dataLib.scheduleLib[id.row];
             }else{
                 controller.worksLib = dataLib.worksLib;
+                let schedule = Schedule();
+                controller.scheduleToEdit = schedule;
+                
             }
         }
     }

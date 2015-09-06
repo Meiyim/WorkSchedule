@@ -9,13 +9,17 @@
 import UIKit
 import QuartzCore
 
-class NewScheduleVC: UIViewController {
+class CycleManagementVC: UIViewController {
 
     
     // MARK: - Properties
     var scheduleToEdit :Schedule!;
     var worksLib: WorksLib!;
     var isRiseUp = true;
+    lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
+        ret.dateStyle = .NoStyle
+        ret.timeStyle = .ShortStyle;
+        return ret;}()
     // MARK: - Outlets
     @IBOutlet weak var riseButton: UIBarButtonItem!
     @IBOutlet weak var doneButton: UIBarButtonItem!
@@ -23,14 +27,15 @@ class NewScheduleVC: UIViewController {
     @IBOutlet weak var trashButton: UIBarButtonItem!
     @IBOutlet weak var toolBar: UIToolbar!
     @IBOutlet weak var riseUpView: RiseUpView!
-    @IBOutlet weak var navigationBar: UINavigationBar!
+    //@IBOutlet weak var navigationBar: UINavigationBar!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var riseUpTableView: UITableView!
 
     // MARK: - Actions
+    /*
     @IBAction func cancel(sender: AnyObject) {
         dismissViewControllerAnimated(true, completion: nil);
-    }
+    }*/
     @IBAction func moveRiseUpView(sender: AnyObject){
         if let recognizer = sender as? UIGestureRecognizer{
             let position = recognizer.locationInView(riseUpTableView); //taping somewhere else
@@ -87,7 +92,7 @@ class NewScheduleVC: UIViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 44, right: 0)
         let button2 = toolBar.items?[1] as! UIBarButtonItem;
         button2.width = (view.bounds.width - 88) //the width of the trash item is 44!
         if scheduleToEdit == nil {
@@ -108,23 +113,24 @@ class NewScheduleVC: UIViewController {
     */
 
 }
-extension NewScheduleVC :UITableViewDelegate{
+extension CycleManagementVC :UITableViewDelegate{
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
         return true
     }
-    
     // Override to support conditional rearranging of the table view.
     func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the item to be re-orderable.
         return true
     }
 }
-extension NewScheduleVC :UITableViewDataSource{
+extension CycleManagementVC :UITableViewDataSource{
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //return scheduleToEdit.parts.count;
-        return scheduleToEdit.parts.count;
+        return scheduleToEdit.numberOfWorksInDay(section);
+    }
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return scheduleToEdit.lastDays;
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell: UITableViewCell
@@ -133,43 +139,44 @@ extension NewScheduleVC :UITableViewDataSource{
         }else {
             cell =  UITableViewCell(style: .Value1, reuseIdentifier: "worksArrangementCell");
         }
-        let id = indexPath.row;
-        cell.textLabel?.text = scheduleToEdit.parts[id].title;
-        cell.detailTextLabel?.text = "hola";
+        let work = scheduleToEdit.workForIndexPath(indexPath);
+        cell.textLabel?.text = work.title;
+        cell.detailTextLabel?.text = String(format: "%@ ~ %@",
+            work.begin.formattedString,work.end.formattedString);
+        
         return cell;
     }
-    
-    
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return String(format:"第%d天",section+1);
+    }
+    /*
      func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            scheduleToEdit.parts.removeAtIndex(indexPath.row)
+            //scheduleToEdit.parts.removeAtIndex(indexPath.row)
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade);
         }
     }
-    
-    
-    
     // Override to support rearranging the table view.
     func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
         
         let toID = toIndexPath.row;
         let fromID = fromIndexPath.row;
         
-        let work = scheduleToEdit.parts[fromID];
-        scheduleToEdit.parts.removeAtIndex(fromID);
-        scheduleToEdit.parts.insert(work, atIndex: toID);
+        //let work = scheduleToEdit.parts[fromID];
+        //scheduleToEdit.parts.removeAtIndex(fromID);
+        //scheduleToEdit.parts.insert(work, atIndex: toID);
         println(toID,fromID);
     }
-    
+    */
 }
 
-extension NewScheduleVC: UINavigationBarDelegate{ //deal with the status bar
+extension CycleManagementVC: UINavigationBarDelegate{ //deal with the status bar
     func positionForBar(bar: UIBarPositioning) -> UIBarPosition {
         return .TopAttached
     }
 }
 
-extension NewScheduleVC: UIGestureRecognizerDelegate{
+extension CycleManagementVC: UIGestureRecognizerDelegate{
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
         let views = riseUpView.subviews as! [UIView];
         if let ok = find(views, touch.view) {
@@ -184,14 +191,23 @@ extension NewScheduleVC: UIGestureRecognizerDelegate{
 
 }
 
-extension NewScheduleVC: RiseUpViewDelegate {
+extension CycleManagementVC: RiseUpViewDelegate {
     func riseUpViewDidSelectId(indexPath: NSIndexPath) {
         let id = indexPath.row;
-        scheduleToEdit.parts.append(worksLib.lib[id]);
-        let idToInsert = NSIndexPath(forRow: scheduleToEdit.parts.count - 1, inSection: 0)
-        println("did insert schedule at \(id)")
-        tableView.insertRowsAtIndexPaths([idToInsert], withRowAnimation: .Fade)
-        println("shoudld insert row at \(idToInsert.row)");
+        let workToAppend = worksLib.lib[id];
+        if let idToInsert = scheduleToEdit.appendWork(workToAppend){
+            //if idToInsert.row == -1 {
+           //     let id = NSIndexPath(forRow: 0, inSection: idToInsert.section);
+             //   tableView.insertRowsAtIndexPaths([id], withRowAnimation: .Fade)
+           // }else{
+                tableView.insertRowsAtIndexPaths([idToInsert], withRowAnimation: .Fade);
+           // }
+        }else{
+            let set = NSIndexSet(index: scheduleToEdit.lastDays - 1)
+            println("will insert sections at \(scheduleToEdit.lastDays)");
+            tableView.insertSections(set, withRowAnimation: .Fade)
+        }
+        println("did insert schedule at last")
     }
 
     

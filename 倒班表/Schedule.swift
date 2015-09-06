@@ -14,30 +14,33 @@ func documentDirectory() -> String {
 func dataFilePath()->String {
     return documentDirectory().stringByAppendingPathComponent("Schedules.plist")
 }
-
+func timeZoneOffset()->Double {
+    return Double(NSTimeZone.systemTimeZone().secondsFromGMT);
+}
 class Part: NSObject, NSCoding{
     var title = "";
     var isWork = true;
     var shouldRemind = false;
     var last: NSTimeInterval{
         get{
-            var ret = end - begin + 1;
-            if ret < 0 {
-                ret+=(24*3600);
-            }
-            return ret;
+            return end - begin + 1;
         }
     }
+
     var begin: NSTimeInterval = 0
     var end: NSTimeInterval = 0
     var beginDate: NSDate = NSDate(){
         didSet{
-            begin = beginDate.timeIntervalSinceReferenceDate % (3600*24)
+            begin = (beginDate.timeIntervalSinceReferenceDate + timeZoneOffset()) % (3600*24.0) ;
+            println("did set2");
         }
     };
     var endDate: NSDate = NSDate(){
         didSet{
-            end = endDate.timeIntervalSinceReferenceDate % (3600*24)
+            end = (endDate.timeIntervalSinceReferenceDate + timeZoneOffset() ) % (3600*24.0);
+            if end < begin {
+                end += 3600 * 24;
+            }
         }
     };
     init(name: String,beginDate: NSDate, endDate: NSDate, shouldRemind: Bool = false){
@@ -45,8 +48,19 @@ class Part: NSObject, NSCoding{
         self.beginDate = beginDate;
         self.endDate = endDate;
         self.shouldRemind = shouldRemind;
-        begin = beginDate.timeIntervalSinceReferenceDate % (3600*24)
-        end = endDate.timeIntervalSinceReferenceDate % (3600*24)
+        super.init();
+        begin = (beginDate.timeIntervalSinceReferenceDate + timeZoneOffset()) % (3600*24.0) ;
+        end = (endDate.timeIntervalSinceReferenceDate + timeZoneOffset() ) % (3600*24.0);
+        println("did set1");
+        if end < begin {
+            end += 24 * 3600;
+        }
+    }
+    func isConflictWithWork(work: Part)->Bool {
+        if(self.end < work.begin || self.begin > work.end){
+            return false;
+        }
+        return true;
     }
     //MARK: - NSCoding
     func encodeWithCoder(aCoder: NSCoder) {
@@ -69,9 +83,130 @@ class Part: NSObject, NSCoding{
 
 }
 
+
+class Day{
+    var parts = [Part]();
+    weak var yesterday: Day?;
+    var tail: NSTimeInterval?{
+        get{
+            if let iterval = parts.last?.end  {
+                if iterval > 3600 * 24 {
+                    return iterval - 3600*24;
+                }
+            }
+            return nil;
+        }
+    };
+    func isWorkConflict(thiswork: Part) -> Bool{
+        for work in parts{
+            if work.isConflictWithWork(thiswork) {
+                return true;
+            }
+        }
+        if(thiswork.end < yesterday?.tail || thiswork.begin < yesterday?.tail){
+            return true;
+        }
+        return false;
+    }
+    func addWork(work: Part)->Int{
+        if let  id = positionBeforeIndexForWork(work){
+            parts.insert(work, atIndex: id);
+            return id;
+        }else{
+            assert(false, "never should come here");
+            return 0;
+        }
+    }
+    func removeWorkatIndex(id: Int){
+        parts.removeAtIndex(id);
+    }
+    func positionBeforeIndexForWork(work: Part) -> Int?{
+        if isWorkConflict(work){
+            return nil;
+        }else{
+            for (var i: Int = 0 ;i != parts.count; ++i) {
+                if parts[i].begin > work.end {
+                    return i;
+                }
+            }
+            return 0;
+        }
+    }
+}
+
 class Schedule {
     var title = "";
-    var parts = [Part]();
+    private var days = [Day]();
+    var lastDays: Int {
+        get{
+            return days.count;
+        }
+    }
+    init(){
+        days.append(Day());
+    }
+    func workForIndexPath(indexPath: NSIndexPath) -> Part{
+       return days[indexPath.section].parts[indexPath.row];
+    }
+    func isWorkConflictWithIndexPath(indexPath: NSIndexPath, work: Part) -> Bool{
+        return days[indexPath.section].isWorkConflict(work);
+    }
+    func addEmptyDay(id: Int){
+        let dayToInsert = Day();
+        dayToInsert.yesterday = days[id-1];
+        if(id != days.count ){
+            days[id].yesterday = dayToInsert;
+        }
+        days.insert(dayToInsert, atIndex: id);
+    }
+    func removeEmptyDay(day: Int){
+        assert(days[day].parts.isEmpty, "must ensure removing a emptyDay")
+        if day !=  days.count - 1{
+            if day == 0 {
+                days[1].yesterday = nil;
+            }else{
+                days[day+1].yesterday = days[day-1];
+            }
+        }
+        days.removeAtIndex(day);
+    }
+    func positionForWork(work: Part, forIndex indexPath: NSIndexPath) -> NSIndexPath?{
+        if let row = days[indexPath.section].positionBeforeIndexForWork(work){
+            return NSIndexPath(forRow: row, inSection: indexPath.section)
+        }
+        return nil;
+    }
+    func appendWork(work: Part) -> NSIndexPath?{
+        if(days.last != nil && !days.last!.isWorkConflict(work) ){
+            //insert at last day
+            let insertedRow = days.last?.addWork(work);
+            let insertedSection = days.count - 1;
+            let insertedIndex = NSIndexPath(forRow: insertedRow!, inSection: insertedSection)
+            return insertedIndex;
+        }
+        //append in the new day;
+        addEmptyDay(days.count);
+        days.last?.addWork(work);
+        println("inserted new days at the end");
+        return nil;
+    }
+    func addWork(work: Part, inIndex day: NSIndexPath)->NSIndexPath?{
+        let row =  days[day.section].addWork(work);
+        return NSIndexPath(forRow: row, inSection: day.section);
+    }
+    func removeWork(inIndex: NSIndexPath){
+        let day = inIndex.section;
+        let workIndex = inIndex.row;
+        days[day].removeWorkatIndex(workIndex);
+        if days[day].parts.isEmpty{
+            removeEmptyDay(day);
+        }
+        return;
+    }
+    func numberOfWorksInDay(day: Int)->Int{
+        return days[day].parts.count;
+    }
+    
 }
 class WorksLib {
     var lib = [Part]()
@@ -97,14 +232,5 @@ class DataLib {
                 unarchiver.finishDecoding();
             }
         }
-    }
-}
-extension NSTimeInterval {
-    var formattedString: String{
-        assert(self < 3600*24, "Time Interval should less than 24h")
-        let h: Int = Int(self) / 3600;
-        let min: Int = (Int(self) % 3600) / 60;
-        let str = String(format: "%2d : %02d", h, min)
-        return str;
     }
 }

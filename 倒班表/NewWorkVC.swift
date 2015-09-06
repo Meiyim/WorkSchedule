@@ -157,6 +157,7 @@ class NewWorkVC: UITableViewController {
                 }else{
                     assert(false, "never should come here")
                 }
+                picker.timeZone = NSTimeZone.systemTimeZone();
                 picker.datePickerMode = .Time;
                 picker.minuteInterval = 5;
                 picker.timeZone = nil;
