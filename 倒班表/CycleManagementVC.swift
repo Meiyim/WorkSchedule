@@ -66,7 +66,7 @@ class CycleManagementVC: UIViewController {
 
     override func animationDidStop(anim: CAAnimation!, finished flag: Bool) {
         if isRiseUp {
-            riseUpView.layer.removeAllAnimations();
+            riseUpView.layer.removeAllAnimations(); //set status when is up
             riseUpView.center.x = view.bounds.width / 2;
             riseUpView.center.y = view.bounds.height - (riseUpView.bounds.height / 2);
             isRiseUp = false;
@@ -75,14 +75,16 @@ class CycleManagementVC: UIViewController {
             rec.cancelsTouchesInView = false;
             rec.delegate = self
             view.addGestureRecognizer(rec);
+            tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: riseUpView.frame.height, right: 0)
         }else{
-            riseUpView.layer.removeAllAnimations();
+            riseUpView.layer.removeAllAnimations(); // set status when is down
             riseUpView.frame.origin.x = 0;
             riseUpView.frame.origin.y = view.bounds.height - 44;
             isRiseUp = true;
             riseButton.enabled = true;
             let rec = view.gestureRecognizers?[0] as! UITapGestureRecognizer;
             view.removeGestureRecognizer(rec);
+            tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
         }
     }
     // MARK: - View;
@@ -95,12 +97,9 @@ class CycleManagementVC: UIViewController {
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 44, right: 0)
         let button2 = toolBar.items?[1] as! UIBarButtonItem;
         button2.width = (view.bounds.width - 88) //the width of the trash item is 44!
-        if scheduleToEdit == nil {
-            scheduleToEdit = Schedule();
-        }
         riseUpView.worksLib = worksLib;
         riseUpView.delegate = self;
-        tableView.setEditing(true, animated: true);
+        //tableView.setEditing(true, animated: true);
     }
     /*
     // MARK: - Navigation
@@ -141,8 +140,7 @@ extension CycleManagementVC :UITableViewDataSource{
         }
         let work = scheduleToEdit.workForIndexPath(indexPath);
         cell.textLabel?.text = work.title;
-        cell.detailTextLabel?.text = String(format: "%@ ~ %@",
-            work.begin.formattedString,work.end.formattedString);
+        cell.detailTextLabel?.text = work.descriptionIn24h;
         
         return cell;
     }

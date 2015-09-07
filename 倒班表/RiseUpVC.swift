@@ -36,9 +36,15 @@ extension RiseUpView: UITableViewDataSource {
         return 1;
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .Default, reuseIdentifier: "worksCell");
+        var cell: UITableViewCell;
+        if let cell2 = riseUpTableView.dequeueReusableCellWithIdentifier("worksCell") as? UITableViewCell {
+            cell = cell2;
+        }else{
+            cell = UITableViewCell(style: .Value1, reuseIdentifier: "worksCell");
+        }
         let id = indexPath.row;
         cell.textLabel?.text = worksLib.lib[id].title;
+        cell.detailTextLabel?.text = worksLib.lib[id].descriptionIn24h;
         return cell
     }
 }

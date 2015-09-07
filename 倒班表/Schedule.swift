@@ -31,26 +31,30 @@ class Part: NSObject, NSCoding{
     var end: NSTimeInterval = 0
     var beginDate: NSDate = NSDate(){
         didSet{
-            begin = (beginDate.timeIntervalSinceReferenceDate + timeZoneOffset()) % (3600*24.0) ;
+            begin = (beginDate.timeIntervalSinceReferenceDate) % (3600*24.0) + timeZoneOffset() ;
             println("did set2");
         }
     };
     var endDate: NSDate = NSDate(){
         didSet{
-            end = (endDate.timeIntervalSinceReferenceDate + timeZoneOffset() ) % (3600*24.0);
+            end = (endDate.timeIntervalSinceReferenceDate ) % (3600*24.0) + timeZoneOffset() ;
             if end < begin {
                 end += 3600 * 24;
             }
         }
     };
+    var descriptionIn24h: String{
+        return String(format: "%@ ~ %@",
+            begin.formattedString,end.formattedString);
+    }
     init(name: String,beginDate: NSDate, endDate: NSDate, shouldRemind: Bool = false){
         title = name;
         self.beginDate = beginDate;
         self.endDate = endDate;
         self.shouldRemind = shouldRemind;
         super.init();
-        begin = (beginDate.timeIntervalSinceReferenceDate + timeZoneOffset()) % (3600*24.0) ;
-        end = (endDate.timeIntervalSinceReferenceDate + timeZoneOffset() ) % (3600*24.0);
+        begin = (beginDate.timeIntervalSinceReferenceDate ) % (3600*24.0) + timeZoneOffset() ;
+        end = (endDate.timeIntervalSinceReferenceDate ) % (3600*24.0) + timeZoneOffset() ;
         println("did set1");
         if end < begin {
             end += 24 * 3600;
@@ -143,7 +147,7 @@ class Schedule {
         }
     }
     init(){
-        days.append(Day());
+        //days.append(Day());
     }
     func workForIndexPath(indexPath: NSIndexPath) -> Part{
        return days[indexPath.section].parts[indexPath.row];
@@ -153,7 +157,9 @@ class Schedule {
     }
     func addEmptyDay(id: Int){
         let dayToInsert = Day();
-        dayToInsert.yesterday = days[id-1];
+        if  id != 0 {
+            dayToInsert.yesterday = days[id-1];
+        }
         if(id != days.count ){
             days[id].yesterday = dayToInsert;
         }
@@ -177,13 +183,14 @@ class Schedule {
         return nil;
     }
     func appendWork(work: Part) -> NSIndexPath?{
+        /* commant out temporally
         if(days.last != nil && !days.last!.isWorkConflict(work) ){
             //insert at last day
             let insertedRow = days.last?.addWork(work);
             let insertedSection = days.count - 1;
             let insertedIndex = NSIndexPath(forRow: insertedRow!, inSection: insertedSection)
             return insertedIndex;
-        }
+        }*/
         //append in the new day;
         addEmptyDay(days.count);
         days.last?.addWork(work);
