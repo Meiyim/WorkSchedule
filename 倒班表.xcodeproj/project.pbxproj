@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6B71F8B31B9C4D900025DAE4 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B71F8B21B9C4D900025DAE4 /* extensions.swift */; };
+		6B71F8B31B9C4D900025DAE4 /* SystemExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B71F8B21B9C4D900025DAE4 /* SystemExtensions.swift */; };
 		6B7E64411B9075C000C3B005 /* RiseUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7E64401B9075C000C3B005 /* RiseUpVC.swift */; };
 		6BBD16971B842959006E980C /* SchedulesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD16961B842959006E980C /* SchedulesVC.swift */; };
 		6BBD169B1B8429F7006E980C /* NowVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD169A1B8429F7006E980C /* NowVC.swift */; };
@@ -35,7 +35,7 @@
 
 /* Begin PBXFileReference section */
 		6B4165621B86C49C00AE4F5F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
-		6B71F8B21B9C4D900025DAE4 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
+		6B71F8B21B9C4D900025DAE4 /* SystemExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemExtensions.swift; sourceTree = "<group>"; };
 		6B7E64401B9075C000C3B005 /* RiseUpVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RiseUpVC.swift; sourceTree = "<group>"; };
 		6BBD16961B842959006E980C /* SchedulesVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchedulesVC.swift; sourceTree = "<group>"; };
 		6BBD169A1B8429F7006E980C /* NowVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NowVC.swift; sourceTree = "<group>"; };
@@ -99,7 +99,7 @@
 				6BFB36C91B83305C002198F6 /* Images.xcassets */,
 				6BFB36CB1B83305C002198F6 /* LaunchScreen.xib */,
 				6BBD169C1B842A11006E980C /* Schedule.swift */,
-				6B71F8B21B9C4D900025DAE4 /* extensions.swift */,
+				6B71F8B21B9C4D900025DAE4 /* SystemExtensions.swift */,
 				6BFB36BE1B83305C002198F6 /* Supporting Files */,
 				6BBD16961B842959006E980C /* SchedulesVC.swift */,
 				6BBD169A1B8429F7006E980C /* NowVC.swift */,
@@ -242,7 +242,7 @@
 				6B7E64411B9075C000C3B005 /* RiseUpVC.swift in Sources */,
 				6BBD169D1B842A11006E980C /* Schedule.swift in Sources */,
 				6BBD16A11B85D480006E980C /* NewWorkVC.swift in Sources */,
-				6B71F8B31B9C4D900025DAE4 /* extensions.swift in Sources */,
+				6B71F8B31B9C4D900025DAE4 /* SystemExtensions.swift in Sources */,
 				6BE592461B9A891300E84975 /* ScheduleManagementVC.swift in Sources */,
 				6BBD16971B842959006E980C /* SchedulesVC.swift in Sources */,
 				6BFB36C11B83305C002198F6 /* AppDelegate.swift in Sources */,

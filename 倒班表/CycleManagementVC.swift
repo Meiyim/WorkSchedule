@@ -36,6 +36,7 @@ class CycleManagementVC: UIViewController {
     @IBAction func cancel(sender: AnyObject) {
         dismissViewControllerAnimated(true, completion: nil);
     }*/
+
     @IBAction func moveRiseUpView(sender: AnyObject){
         if let recognizer = sender as? UIGestureRecognizer{
             let position = recognizer.locationInView(riseUpTableView); //taping somewhere else
@@ -92,6 +93,10 @@ class CycleManagementVC: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    override func setEditing(editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        tableView.setEditing(editing, animated: animated);
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 44, right: 0)
@@ -99,6 +104,7 @@ class CycleManagementVC: UIViewController {
         button2.width = (view.bounds.width - 88) //the width of the trash item is 44!
         riseUpView.worksLib = worksLib;
         riseUpView.delegate = self;
+        navigationItem.rightBarButtonItem = editButtonItem();
         //tableView.setEditing(true, animated: true);
     }
     /*
@@ -147,13 +153,20 @@ extension CycleManagementVC :UITableViewDataSource{
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return String(format:"第%d天",section+1);
     }
-    /*
+    
      func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            //scheduleToEdit.parts.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade);
+            if scheduleToEdit.removeWork(indexPath) {
+                let set = NSIndexSet(index: indexPath.section)
+                tableView.deleteSections(set, withRowAnimation: .Fade) // delete the whole damn section
+                doAfterDelay(0.3, {tableView.reloadData()}) // using this asynchronous method could be a little dangerous
+                
+            }else{
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade); //just delet the row
+            }
         }
     }
+    /*
     // Override to support rearranging the table view.
     func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
         

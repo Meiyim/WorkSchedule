@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import Dispatch
 
 extension NSTimeInterval {
     var formattedString: String{
@@ -19,4 +20,9 @@ extension NSTimeInterval {
         let str = String(format: "%2d : %02d", h, min)
         return str;
     }
+}
+
+func doAfterDelay(seconds: Double, closure: ()->()){ // GCD framework!
+    let when = dispatch_time(DISPATCH_TIME_NOW, Int64(seconds * Double(NSEC_PER_SEC)));
+    dispatch_after(when, dispatch_get_main_queue(), closure);
 }

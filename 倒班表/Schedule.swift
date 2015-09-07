@@ -201,14 +201,15 @@ class Schedule {
         let row =  days[day.section].addWork(work);
         return NSIndexPath(forRow: row, inSection: day.section);
     }
-    func removeWork(inIndex: NSIndexPath){
+    func removeWork(inIndex: NSIndexPath)->Bool{ // the return value indicated if a section is needed to be deleted too.
         let day = inIndex.section;
         let workIndex = inIndex.row;
         days[day].removeWorkatIndex(workIndex);
         if days[day].parts.isEmpty{
             removeEmptyDay(day);
+            return true;
         }
-        return;
+        return false;
     }
     func numberOfWorksInDay(day: Int)->Int{
         return days[day].parts.count;
