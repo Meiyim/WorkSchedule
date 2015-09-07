@@ -31,13 +31,13 @@ class Part: NSObject, NSCoding{
     var end: NSTimeInterval = 0
     var beginDate: NSDate = NSDate(){
         didSet{
-            begin = (beginDate.timeIntervalSinceReferenceDate) % (3600*24.0) + timeZoneOffset() ;
+            begin = (beginDate.timeIntervalSinceReferenceDate  ) % (3600*24.0) ;
             println("did set2");
         }
     };
     var endDate: NSDate = NSDate(){
         didSet{
-            end = (endDate.timeIntervalSinceReferenceDate ) % (3600*24.0) + timeZoneOffset() ;
+            end = (endDate.timeIntervalSinceReferenceDate   ) % (3600*24.0) ;
             if end < begin {
                 end += 3600 * 24;
             }
@@ -53,8 +53,8 @@ class Part: NSObject, NSCoding{
         self.endDate = endDate;
         self.shouldRemind = shouldRemind;
         super.init();
-        begin = (beginDate.timeIntervalSinceReferenceDate ) % (3600*24.0) + timeZoneOffset() ;
-        end = (endDate.timeIntervalSinceReferenceDate ) % (3600*24.0) + timeZoneOffset() ;
+        begin = (beginDate.timeIntervalSinceReferenceDate) % (3600*24.0);
+        end = (endDate.timeIntervalSinceReferenceDate) % (3600*24.0)
         println("did set1");
         if end < begin {
             end += 24 * 3600;
@@ -71,17 +71,19 @@ class Part: NSObject, NSCoding{
         aCoder.encodeObject(title, forKey: "title")
         aCoder.encodeBool(isWork, forKey: "isWork")
         aCoder.encodeBool(shouldRemind, forKey: "shouldRemind")
-        aCoder.encodeObject(beginDate, forKey: "beginDate")
-        aCoder.encodeObject(endDate, forKey: "endDate")
+        //aCoder.encodeObject(beginDate, forKey: "beginDate")
+        //aCoder.encodeObject(endDate, forKey: "endDate")
+        aCoder.encodeDouble(begin, forKey: "begin"); // only save time intervals!
+        aCoder.encodeDouble(end, forKey: "end");
     }
     required init(coder aDecoder: NSCoder) {
         title = aDecoder.decodeObjectForKey("title") as! String
         isWork = aDecoder.decodeBoolForKey("isWork")
         shouldRemind = aDecoder.decodeBoolForKey("shouldRemind");
-        beginDate = aDecoder.decodeObjectForKey("beginDate") as! NSDate;
-        endDate = aDecoder.decodeObjectForKey("endDate") as! NSDate;
-        begin = beginDate.timeIntervalSinceReferenceDate % (3600*24)
-        end = endDate.timeIntervalSinceReferenceDate % (3600*24)
+        begin = aDecoder.decodeDoubleForKey("begin");
+        end = aDecoder.decodeDoubleForKey("end");
+        beginDate = NSDate(timeIntervalSinceReferenceDate: begin); //all in GMT timeZone
+        endDate = NSDate(timeIntervalSinceReferenceDate: end);
         super.init();
     }
 

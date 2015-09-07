@@ -17,6 +17,7 @@ class NewWorkVC: UITableViewController {
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
         ret.timeStyle = .ShortStyle;
+        ret.timeZone = NSTimeZone(forSecondsFromGMT: 0);
         return ret;}()
     var beginDate: NSDate? {
         didSet{
@@ -71,6 +72,7 @@ class NewWorkVC: UITableViewController {
                     let work = Part(name: textField.text, beginDate: beg, endDate: end,shouldRemind: shouldRemindSwitch.on)
                     delegate?.appendNewWork(work)
                 }
+                println(beg);
             }
         }
         dismissViewControllerAnimated(true, completion: nil)
@@ -79,7 +81,6 @@ class NewWorkVC: UITableViewController {
     @IBAction func close(sender: UIBarButtonItem) {
         dismissViewControllerAnimated(true, completion: nil)
     }
-    
     //MARK: - Views
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -157,10 +158,9 @@ class NewWorkVC: UITableViewController {
                 }else{
                     assert(false, "never should come here")
                 }
-                picker.timeZone = NSTimeZone.systemTimeZone();
+                picker.timeZone = NSTimeZone(forSecondsFromGMT: 0);
                 picker.datePickerMode = .Time;
                 picker.minuteInterval = 5;
-                picker.timeZone = nil;
             }
             return cell
             

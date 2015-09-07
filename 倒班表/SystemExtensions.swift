@@ -12,6 +12,7 @@ import Dispatch
 
 extension NSTimeInterval {
     var formattedString: String{
+        
         assert(self < 3600*24*2, "Time Interval should less than 24h")
         var time = self;
         if time > 3600*24 {time -= 3600*24.0}
