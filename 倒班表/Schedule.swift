@@ -47,6 +47,9 @@ class Part: NSObject, NSCoding{
         return String(format: "%@ ~ %@",
             begin.formattedString,end.formattedString);
     }
+    override init(){
+        super.init();
+    }
     init(name: String,beginDate: NSDate, endDate: NSDate, shouldRemind: Bool = false){
         title = name;
         self.beginDate = beginDate;
@@ -88,33 +91,50 @@ class Part: NSObject, NSCoding{
     }
 
 }
-
-
-class Day{
-    var parts = [Part]();
-    weak var yesterday: Day?;
-    var tail: NSTimeInterval?{
+class BreakPart: Part{
+    var lastValue: NSTimeInterval = 0.0;
+    init(last: Double){
+        super.init();
+        end = 88888888;
+        begin = 88888888;
+        lastValue = last;
+        
+    }
+    override var last: NSTimeInterval{
         get{
-            if let iterval = parts.last?.end  {
-                if iterval > 3600 * 24 {
-                    return iterval - 3600*24;
+            return lastValue;
+        }
+    }
+    required init(coder aDecoder: NSCoder) {
+        super.init();
+        end = 88888888;
+        begin = 88888888;
+    }
+}
+class Schedule {
+    class Day{
+        var parts = [Part]();
+        weak var yesterday: Day?;
+        var tail: NSTimeInterval?{
+            get{if let iterval = parts.last?.end  {
+                    if iterval > 3600 * 24 {return iterval - 3600*24;}
+                }
+                return nil;
+            }
+        };
+        var intervals = [NSTimeInterval]();
+        func isWorkConflict(thiswork: Part) -> Bool{
+            for work in parts{
+                if work.isConflictWithWork(thiswork) {
+                    return true;
                 }
             }
-            return nil;
-        }
-    };
-    func isWorkConflict(thiswork: Part) -> Bool{
-        for work in parts{
-            if work.isConflictWithWork(thiswork) {
+            if(thiswork.end < yesterday?.tail || thiswork.begin < yesterday?.tail){
                 return true;
             }
+            return false;
         }
-        if(thiswork.end < yesterday?.tail || thiswork.begin < yesterday?.tail){
-            return true;
-        }
-        return false;
-    }
-    func addWork(work: Part)->Int{
+        func addWork(work: Part)->Int{
         if let  id = positionBeforeIndexForWork(work){
             parts.insert(work, atIndex: id);
             return id;
@@ -123,10 +143,10 @@ class Day{
             return 0;
         }
     }
-    func removeWorkatIndex(id: Int){
+        func removeWorkatIndex(id: Int){
         parts.removeAtIndex(id);
     }
-    func positionBeforeIndexForWork(work: Part) -> Int?{
+        func positionBeforeIndexForWork(work: Part) -> Int?{
         if isWorkConflict(work){
             return nil;
         }else{
@@ -138,25 +158,80 @@ class Day{
             return 0;
         }
     }
-}
-
-class Schedule {
-    var title = "";
-    private var days = [Day]();
-    var lastDays: Int {
-        get{
-            return days.count;
+        private func checkNumberOfIntervals(){
+            assert( !parts.isEmpty, "cannot envoke this method on a empty day")
+            let threshHold = 10 * 60.0; // threshHold used to distingush different part; now it is 10 min;
+            intervals.removeAll(keepCapacity: true);
+            var lastEnd: NSTimeInterval! = yesterday?.tail;
+            if lastEnd == nil {lastEnd = 60.0};
+            for(var i = 0; i != self.parts.count ; ++i){
+                if(parts[i].begin > lastEnd + threshHold){
+                    intervals.append(parts[i].begin - lastEnd + 60.0); //加60秒钟是为了防止出现两班之间间隔为6:59这种情况。因为part中的end和begin在秒级的位置上不准确
+                    lastEnd = parts[i].end;
+                }
+                intervals.append(-1.0 * Double(i)); //if negative intervals intervals the index of part in parts;
+            }
+            if parts.last?.end < 3600 * 24 - threshHold {
+                intervals.append(3600*24.0 - parts.last!.end + 60.0);
+            }
+            
         }
     }
+
+
+    var title = "";
+    var isInEdittingMode = false{
+        didSet{
+            if isInEdittingMode == false {
+                for day in days{
+                    day.checkNumberOfIntervals();
+                }
+            }
+        }
+    };
+    private var days = [Day]();
+    
     init(){
         //days.append(Day());
     }
+    //MARK: - querry method
     func workForIndexPath(indexPath: NSIndexPath) -> Part{
-       return days[indexPath.section].parts[indexPath.row];
+        let day = days[indexPath.section]
+        if isInEdittingMode{
+            return day.parts[indexPath.row];
+        }else{
+            let interval = day.intervals[indexPath.row]
+            if interval < 0.1{
+                return day.parts[Int(-interval)]; //indicating a work
+            }else{
+                return BreakPart(last: interval); // indicating a break;
+            }
+            
+        }
     }
-    func isWorkConflictWithIndexPath(indexPath: NSIndexPath, work: Part) -> Bool{
-        return days[indexPath.section].isWorkConflict(work);
+    func indexPathOfIntervals() -> [NSIndexPath]{ // return the position of intervals in ANY mode. help to delete extra rows in editing mode;
+        var ret = [NSIndexPath]();
+        for day in 0 ..< lastDays {
+            let thisDay = days[day]
+            for part in 0 ..< thisDay.intervals.count{
+                if thisDay.intervals[part] > 0.1 {
+                    ret.append(NSIndexPath(forRow: part, inSection: day))
+                }
+            }
+        }
+        return ret;
     }
+    func numberOfWorksInDay(day: Int)->Int{
+        if isInEdittingMode{
+            return days[day].parts.count;
+        }else{
+            return days[day].intervals.count;
+        }
+    }
+    var lastDays: Int {
+        get{return days.count;}
+    }
+    //MARK: - addNew Method --- this method can be used in display mode;
     func addEmptyDay(id: Int){
         let dayToInsert = Day();
         if  id != 0 {
@@ -167,7 +242,37 @@ class Schedule {
         }
         days.insert(dayToInsert, atIndex: id);
     }
+    func appendWork(work: Part) -> NSIndexPath?{ //always append at last in a new day
+        /* commant out temporally
+        if(days.last != nil && !days.last!.isWorkConflict(work) ){
+        //insert at last day
+        let insertedRow = days.last?.addWork(work);
+        let insertedSection = days.count - 1;
+        let insertedIndex = NSIndexPath(forRow: insertedRow!, inSection: insertedSection)
+        return insertedIndex;
+        }*/
+        //append in the new day;
+        addEmptyDay(days.count);
+        days.last?.addWork(work);
+        days.last?.checkNumberOfIntervals();
+        println("inserted new days at the end");
+        return nil;
+    }
+    //MARK: - edit method----this mothod must be used in editting mode!
+    /*
+    func isWorkConflictWithIndexPath(indexPath: NSIndexPath, work: Part) -> Bool{
+        assert(isInEdittingMode, "this method must be envoked in Editting mode!");
+        return days[indexPath.section].isWorkConflict(work);
+    }*/
+    func positionForWork(work: Part, forIndex indexPath: NSIndexPath) -> NSIndexPath?{
+        if let row = days[indexPath.section].positionBeforeIndexForWork(work){
+            return NSIndexPath(forRow: row, inSection: indexPath.section)
+        }
+        return nil;
+    }
+
     func removeEmptyDay(day: Int){
+        assert(isInEdittingMode, "this method must be envoked in Editting mode!");
         assert(days[day].parts.isEmpty, "must ensure removing a emptyDay")
         if day !=  days.count - 1{
             if day == 0 {
@@ -178,28 +283,10 @@ class Schedule {
         }
         days.removeAtIndex(day);
     }
-    func positionForWork(work: Part, forIndex indexPath: NSIndexPath) -> NSIndexPath?{
-        if let row = days[indexPath.section].positionBeforeIndexForWork(work){
-            return NSIndexPath(forRow: row, inSection: indexPath.section)
-        }
-        return nil;
-    }
-    func appendWork(work: Part) -> NSIndexPath?{
-        /* commant out temporally
-        if(days.last != nil && !days.last!.isWorkConflict(work) ){
-            //insert at last day
-            let insertedRow = days.last?.addWork(work);
-            let insertedSection = days.count - 1;
-            let insertedIndex = NSIndexPath(forRow: insertedRow!, inSection: insertedSection)
-            return insertedIndex;
-        }*/
-        //append in the new day;
-        addEmptyDay(days.count);
-        days.last?.addWork(work);
-        println("inserted new days at the end");
-        return nil;
-    }
+
+
     func addWork(work: Part, inIndex day: NSIndexPath)->NSIndexPath?{
+        assert(isInEdittingMode, "this method must be envoked in Editting mode!");
         let row =  days[day.section].addWork(work);
         return NSIndexPath(forRow: row, inSection: day.section);
     }
@@ -213,9 +300,8 @@ class Schedule {
         }
         return false;
     }
-    func numberOfWorksInDay(day: Int)->Int{
-        return days[day].parts.count;
-    }
+    //MARK: - utilities
+
     
 }
 class WorksLib {

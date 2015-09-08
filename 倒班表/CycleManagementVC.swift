@@ -19,6 +19,7 @@ class CycleManagementVC: UIViewController {
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
         ret.timeStyle = .ShortStyle;
+        ret.timeZone = NSTimeZone(forSecondsFromGMT: 0);
         return ret;}()
     // MARK: - Outlets
     @IBOutlet weak var riseButton: UIBarButtonItem!
@@ -96,6 +97,15 @@ class CycleManagementVC: UIViewController {
     override func setEditing(editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         tableView.setEditing(editing, animated: animated);
+        scheduleToEdit.isInEdittingMode = editing;
+
+        if editing {
+            let ids = scheduleToEdit.indexPathOfIntervals();
+            tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
+        }else{
+            let ids = scheduleToEdit.indexPathOfIntervals();
+            tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
+        }
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,8 +155,14 @@ extension CycleManagementVC :UITableViewDataSource{
             cell =  UITableViewCell(style: .Value1, reuseIdentifier: "worksArrangementCell");
         }
         let work = scheduleToEdit.workForIndexPath(indexPath);
-        cell.textLabel?.text = work.title;
-        cell.detailTextLabel?.text = work.descriptionIn24h;
+        if work is BreakPart {
+            cell.textLabel?.text = "休息时间"
+            cell.detailTextLabel?.text = "时长：\(work.last.formattedString)";
+        }else{
+            cell.textLabel?.text = work.title;
+            cell.detailTextLabel?.text = work.descriptionIn24h;
+        }
+
         
         return cell;
     }
