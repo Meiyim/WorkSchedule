@@ -98,13 +98,16 @@ class CycleManagementVC: UIViewController {
         super.setEditing(editing, animated: animated)
         tableView.setEditing(editing, animated: animated);
         scheduleToEdit.isInEdittingMode = editing;
+        if !isRiseUp {
+            moveRiseUpView(self);
+        }
 
         if editing {
-            let ids = scheduleToEdit.indexPathOfIntervals();
-            tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
+            let ids = self.scheduleToEdit.indexPathOfIntervals();
+            self.tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
         }else{
-            let ids = scheduleToEdit.indexPathOfIntervals();
-            tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
+            let ids = self.scheduleToEdit.indexPathOfIntervals();
+            self.tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
         }
     }
     override func viewDidLoad() {
@@ -114,6 +117,7 @@ class CycleManagementVC: UIViewController {
         button2.width = (view.bounds.width - 88) //the width of the trash item is 44!
         riseUpView.worksLib = worksLib;
         riseUpView.delegate = self;
+        scheduleToEdit.isInEdittingMode = false
         navigationItem.rightBarButtonItem = editButtonItem();
         //tableView.setEditing(true, animated: true);
     }
@@ -182,19 +186,26 @@ extension CycleManagementVC :UITableViewDataSource{
             }
         }
     }
-    /*
+    
     // Override to support rearranging the table view.
-    func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-        
-        let toID = toIndexPath.row;
-        let fromID = fromIndexPath.row;
-        
-        //let work = scheduleToEdit.parts[fromID];
-        //scheduleToEdit.parts.removeAtIndex(fromID);
-        //scheduleToEdit.parts.insert(work, atIndex: toID);
-        println(toID,fromID);
+    func tableView(tableView: UITableView, targetIndexPathForMoveFromRowAtIndexPath sourceIndexPath: NSIndexPath, toProposedIndexPath proposedDestinationIndexPath: NSIndexPath) -> NSIndexPath {
+        let workToReorder = scheduleToEdit.workForIndexPath(sourceIndexPath);
+        if let destination = scheduleToEdit.positionForWork(workToReorder, forIndex: proposedDestinationIndexPath) {
+            println("should redestinated to \(destination.section),\(destination.row)")
+            return destination;
+        }else{
+            println("should not move")
+            return sourceIndexPath;
+        }
     }
-    */
+    func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+        if fromIndexPath == toIndexPath {return}
+        let workToReorder = scheduleToEdit.workForIndexPath(fromIndexPath);
+        scheduleToEdit.removeWork(fromIndexPath);
+        scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
+
+    }
+    
 }
 
 extension CycleManagementVC: UINavigationBarDelegate{ //deal with the status bar

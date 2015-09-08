@@ -7,16 +7,7 @@
 //
 
 import Foundation
-func documentDirectory() -> String {
-    let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true) as! [String]
-    return paths[0]
-}
-func dataFilePath()->String {
-    return documentDirectory().stringByAppendingPathComponent("Schedules.plist")
-}
-func timeZoneOffset()->Double {
-    return Double(NSTimeZone.systemTimeZone().secondsFromGMT);
-}
+
 class Part: NSObject, NSCoding{
     var title = "";
     var isWork = true;
