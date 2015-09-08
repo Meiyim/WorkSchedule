@@ -201,8 +201,13 @@ extension CycleManagementVC :UITableViewDataSource{
     func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
         if fromIndexPath == toIndexPath {return}
         let workToReorder = scheduleToEdit.workForIndexPath(fromIndexPath);
-        scheduleToEdit.removeWork(fromIndexPath);
-        scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
+        if scheduleToEdit.removeWork(fromIndexPath) { // the retrun value of this method indicate if it needs to remove the whole damne section
+            scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
+            let set = NSIndexSet(index: fromIndexPath.section)
+            tableView.deleteSections(set, withRowAnimation: .Fade)
+        }else{
+            scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
+        }
 
     }
     

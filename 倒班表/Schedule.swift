@@ -146,7 +146,7 @@ class Schedule {
                     return i;
                 }
             }
-            return 0;
+            return parts.count
         }
     }
         private func checkNumberOfIntervals(){
@@ -285,6 +285,7 @@ class Schedule {
         let day = inIndex.section;
         let workIndex = inIndex.row;
         days[day].removeWorkatIndex(workIndex);
+        println("work:\(workIndex) removed at day:\(day)");
         if days[day].parts.isEmpty{
             removeEmptyDay(day);
             return true;
