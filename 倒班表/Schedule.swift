@@ -7,7 +7,6 @@
 //
 
 import Foundation
-
 class Part: NSObject, NSCoding{
     var title = "";
     var isWork = true;
@@ -82,6 +81,7 @@ class Part: NSObject, NSCoding{
     }
 
 }
+
 class BreakPart: Part{
     var lastValue: NSTimeInterval = 0.0;
     init(last: Double){
@@ -114,6 +114,13 @@ class Schedule {
             }
         };
         var intervals = [NSTimeInterval]();
+        var isTemperaDay = false
+        init(isTempera: Bool = false){
+            if isTempera {
+                self.isTemperaDay = false
+                
+            }
+        }
         func isWorkConflict(thiswork: Part) -> Bool{
             for work in parts{
                 if work.isConflictWithWork(thiswork) {

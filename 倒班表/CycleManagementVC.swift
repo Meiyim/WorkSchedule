@@ -16,6 +16,7 @@ class CycleManagementVC: UIViewController {
     var scheduleToEdit :Schedule!;
     var worksLib: WorksLib!;
     var isRiseUp = true;
+    var lastHouveringIndexPath: NSIndexPath?
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
         ret.timeStyle = .ShortStyle;
@@ -89,6 +90,33 @@ class CycleManagementVC: UIViewController {
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
         }
     }
+    // MARK: - utilities
+    func addNewDay(sender: AnyObject ){
+        let button = sender as! UIButton;
+        println(button.tag);
+    }
+    private func canntFindProperPlaceForIndexPath(indexPath: NSIndexPath){
+        if lastHouveringIndexPath == indexPath{ return } //reject repeatedly call
+
+        var set: NSIndexSet!
+        if let lastid = lastHouveringIndexPath { // update data source
+            scheduleToEdit.removeEmptyDay(lastid.section);
+        }
+        scheduleToEdit.addEmptyDay(indexPath.section)        
+        scheduleToEdit.addWork(BreakPart(last: 1), inIndex: indexPath);
+        if let lastid = lastHouveringIndexPath { // update cell
+            set = NSIndexSet(index: lastid.section)
+            tableView.deleteSections(set, withRowAnimation: .Fade)
+        }
+        set = NSIndexSet(index: indexPath.section)
+        tableView.insertSections(set, withRowAnimation: .None)
+        lastHouveringIndexPath = indexPath;
+        /*
+        let range = NSRange(location: 0, length: scheduleToEdit.lastDays - 1);
+        set = NSIndexSet(indexesInRange: range)
+        tableView.reloadSections(set, withRowAnimation: .Fade)
+        */
+    }
     // MARK: - View;
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -109,6 +137,7 @@ class CycleManagementVC: UIViewController {
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
         }
+        doAfterDelay(0.3, {self.tableView.reloadData()})
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,6 +162,7 @@ class CycleManagementVC: UIViewController {
 
 }
 extension CycleManagementVC :UITableViewDelegate{
+
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
@@ -146,12 +176,54 @@ extension CycleManagementVC :UITableViewDelegate{
 }
 extension CycleManagementVC :UITableViewDataSource{
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        println("asking the number of work in day\(section): \(scheduleToEdit.numberOfWorksInDay(section))");
         return scheduleToEdit.numberOfWorksInDay(section);
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return scheduleToEdit.lastDays;
     }
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let lebelRect = CGRect(x: 15, y: tableView.sectionHeaderHeight - 17, width: tableView.bounds.width / 2, height: 17);
+        let label = UILabel(frame: lebelRect);
+        label.font = UIFont.systemFontOfSize(14);
+        label.text = tableView.dataSource!.tableView!(tableView, titleForHeaderInSection: section);
+        label.textColor = UIColor.blackColor()  // color of header titel font
+        label.backgroundColor = UIColor.clearColor()
+        
+        let seperatorRect = CGRect(x: 15, y: tableView.sectionHeaderHeight - 1, width: tableView.bounds.size.width - 15, height: 1)
+        let separator = UIView(frame: seperatorRect)
+        separator.backgroundColor = tableView.tintColor; // color of separator
+        
+        let viewRect = CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: tableView.bounds.size.height)
+        let view = UIView(frame: viewRect)
+        view.backgroundColor = UIColor(white: 1, alpha: 0.85); // color of background
+        view.addSubview(label)
+        view.addSubview(separator)
+
+        let buttonWidth: CGFloat = 40;
+        let buttonRect = CGRect(x: tableView.bounds.width - buttonWidth - 15, y: tableView.sectionHeaderHeight - 17,
+                                width: buttonWidth, height: 17)
+        let button = UIButton(frame: buttonRect);
+        button.setTitle("新增", forState: .Normal) //i18n
+        button.setTitleColor(button.tintColor, forState: .Normal);
+        button.setTitleColor(UIColor(white: 0, alpha: 0.15), forState: .Highlighted);
+        button.showsTouchWhenHighlighted = true;
+        button.titleLabel?.font = UIFont.systemFontOfSize(14);
+        button.addTarget(self, action: Selector("addNewDay:"), forControlEvents: .TouchUpInside);
+        button.tag = section;
+        if (editing){
+            button.enabled = true;
+            button.hidden = false
+        }else{
+            button.enabled = false;
+            button.hidden = true;
+        }
+        view.addSubview(button)
+        
+        return view
+    }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        println("asking for indexPath\(indexPath.section),\(indexPath.row)");
         var cell: UITableViewCell
         if let cell2 = tableView.dequeueReusableCellWithIdentifier("worksArrangementCell") as? UITableViewCell {
             cell = cell2;
@@ -189,19 +261,22 @@ extension CycleManagementVC :UITableViewDataSource{
     
     // Override to support rearranging the table view.
     func tableView(tableView: UITableView, targetIndexPathForMoveFromRowAtIndexPath sourceIndexPath: NSIndexPath, toProposedIndexPath proposedDestinationIndexPath: NSIndexPath) -> NSIndexPath {
+        if sourceIndexPath == proposedDestinationIndexPath {return sourceIndexPath }
         let workToReorder = scheduleToEdit.workForIndexPath(sourceIndexPath);
         if let destination = scheduleToEdit.positionForWork(workToReorder, forIndex: proposedDestinationIndexPath) {
             println("should redestinated to \(destination.section),\(destination.row)")
             return destination;
         }else{
-            println("should not move")
-            return sourceIndexPath;
+            println("should insert a new day");
+            canntFindProperPlaceForIndexPath(proposedDestinationIndexPath);
+            let ret = NSIndexPath(forRow: 0, inSection: proposedDestinationIndexPath.section)
+            return ret;
         }
     }
     func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
         if fromIndexPath == toIndexPath {return}
         let workToReorder = scheduleToEdit.workForIndexPath(fromIndexPath);
-        if scheduleToEdit.removeWork(fromIndexPath) { // the retrun value of this method indicate if it needs to remove the whole damne section
+        if scheduleToEdit.removeWork(fromIndexPath) { // the retrun value of this method indicate if it needs to remove the whole damn section
             scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
             let set = NSIndexSet(index: fromIndexPath.section)
             tableView.deleteSections(set, withRowAnimation: .Fade)
