@@ -81,7 +81,18 @@ class Part: NSObject, NSCoding{
     }
 
 }
-
+class TemperalPart: Part{
+    override init() {
+        super.init();
+        end = 88888888;
+        begin = 88888888;
+    }
+    required init(coder aDecoder: NSCoder) {
+        super.init();
+        end = 88888888;
+        begin = 88888888;
+    }
+}
 class BreakPart: Part{
     var lastValue: NSTimeInterval = 0.0;
     init(last: Double){
@@ -117,8 +128,8 @@ class Schedule {
         var isTemperaDay = false
         init(isTempera: Bool = false){
             if isTempera {
-                self.isTemperaDay = false
-                
+                self.isTemperaDay = true;
+                parts.append(TemperalPart());
             }
         }
         func isWorkConflict(thiswork: Part) -> Bool{
@@ -132,14 +143,22 @@ class Schedule {
             }
             return false;
         }
-        func addWork(work: Part)->Int{
-        if let  id = positionBeforeIndexForWork(work){
-            parts.insert(work, atIndex: id);
-            return id;
-        }else{
-            assert(false, "never should come here");
-            return 0;
-        }
+        func addWork(work: Part)->Int{ //the return value of this method indicate the row of the new inserted work;
+            if isTemperaDay {
+                assert(parts.count == 1,"shouldnt involk this on a empty day")
+                parts.removeAll(keepCapacity: true)
+                parts.append(work)
+                isTemperaDay = false
+                return 0;
+            }else{
+                if let  id = positionBeforeIndexForWork(work){
+                    parts.insert(work, atIndex: id);
+                    return id;
+                }else{
+                    assert(false, "never should come here"); // the new added work conflict with this day
+                    return 0;
+                }
+            }
     }
         func removeWorkatIndex(id: Int){
         parts.removeAtIndex(id);
@@ -193,6 +212,12 @@ class Schedule {
         //days.append(Day());
     }
     //MARK: - querry method
+    func sectionOfTemperalDays() -> Int? {
+        for (var i = 0; i != days.count; ++i){
+            if days[i].isTemperaDay {return i}
+        }
+        return nil;
+    }
     func workForIndexPath(indexPath: NSIndexPath) -> Part{
         let day = days[indexPath.section]
         if isInEdittingMode{
@@ -231,7 +256,7 @@ class Schedule {
     }
     //MARK: - addNew Method --- this method can be used in display mode;
     func addEmptyDay(id: Int){
-        let dayToInsert = Day();
+        let dayToInsert = Day(isTempera: true);
         if  id != 0 {
             dayToInsert.yesterday = days[id-1];
         }
@@ -271,7 +296,7 @@ class Schedule {
 
     func removeEmptyDay(day: Int){
         assert(isInEdittingMode, "this method must be envoked in Editting mode!");
-        assert(days[day].parts.isEmpty, "must ensure removing a emptyDay")
+        assert(days[day].parts.isEmpty || days[day].isTemperaDay, "must ensure removing a emptyDay or a temperal day")
         if day !=  days.count - 1{
             if day == 0 {
                 days[1].yesterday = nil;
@@ -284,16 +309,17 @@ class Schedule {
 
 
     func addWork(work: Part, inIndex day: NSIndexPath)->NSIndexPath?{
-        assert(isInEdittingMode, "this method must be envoked in Editting mode!");
+        assert(isInEdittingMode, "this method must be invoked in Editting mode!");
         let row =  days[day.section].addWork(work);
         return NSIndexPath(forRow: row, inSection: day.section);
     }
-    func removeWork(inIndex: NSIndexPath)->Bool{ // the return value indicated if a section is needed to be deleted too.
+    func removeWork(inIndex: NSIndexPath, closuer: (()->())? = nil)->Bool{ // the return value indicated if a section is needed to be deleted too.
         let day = inIndex.section;
         let workIndex = inIndex.row;
         days[day].removeWorkatIndex(workIndex);
         println("work:\(workIndex) removed at day:\(day)");
-        if days[day].parts.isEmpty{
+        if days[day].parts.isEmpty || days[0].isTemperaDay {
+            closuer?();
             removeEmptyDay(day);
             return true;
         }

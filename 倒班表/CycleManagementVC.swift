@@ -16,7 +16,6 @@ class CycleManagementVC: UIViewController {
     var scheduleToEdit :Schedule!;
     var worksLib: WorksLib!;
     var isRiseUp = true;
-    var lastHouveringIndexPath: NSIndexPath?
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
         ret.timeStyle = .ShortStyle;
@@ -91,32 +90,66 @@ class CycleManagementVC: UIViewController {
         }
     }
     // MARK: - utilities
-    func addNewDay(sender: AnyObject ){
+    private func shoudButtonBeHiddenForSeciont(section: Int) -> Bool{
+        if editing {
+            if let tempDay = scheduleToEdit.sectionOfTemperalDays() {
+                if section == tempDay || section == tempDay + 1{
+                    return true
+                }
+            }
+            return false;
+        }else{
+            return true;
+        }
+    }
+    /*
+    private func updateAddDayButton(){
+        if (editing){
+            if let tempDays = scheduleToEdit.sectionOfTemperalDays(){
+                println(scheduleToEdit.lastDays);
+                for section in 0 ..< scheduleToEdit.lastDays {
+                    let id = section + 429 //special tag for add Day button;
+                    if let button = view.viewWithTag(id) as? UIButton{
+                        println("now tempdays\(section)")
+                        if section == tempDays || section == tempDays + 1{
+                            button.hidden = true;
+                        }else{
+                            button.hidden = false;
+                        }
+                    }else{
+                        println("find button faild in secitin:\(section)")
+                    }
+                }
+            }
+        }else{
+            for section in 0 ..< scheduleToEdit.lastDays {
+                let id = section + 429 //special tag for add Day button;
+                if let button = view.viewWithTag(id) as? UIButton{
+                    button.hidden = true;
+                }
+            }
+        }
+    }*/
+    func addNewDay(sender: AnyObject ){ //inserting a new day
+        assert(editing, "this method must be involked in editing mod")
         let button = sender as! UIButton;
-        println(button.tag);
+        var id = button.tag - 429 //special tag for add Day button
+        assert(id >= 0, "something wrong triggered this selector");
+        if let tempDays = scheduleToEdit.sectionOfTemperalDays() {
+            if(id > tempDays){--id}
+            print("\(tempDays) --> \(id)\n")
+            scheduleToEdit.removeEmptyDay(tempDays)
+            tableView.deleteSections(NSIndexSet(index: tempDays), withRowAnimation: .Right);
+        }
+        scheduleToEdit.addEmptyDay(id);
+        doAfterDelay(0.3){ [unowned self] in
+          self.tableView.insertSections(NSIndexSet(index: id), withRowAnimation: .Right);
+        }
+        doAfterDelay(0.5){ [unowned self] in
+            self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location:0 , length: self.scheduleToEdit.lastDays )), withRowAnimation: .None)
+        }
     }
-    private func canntFindProperPlaceForIndexPath(indexPath: NSIndexPath){
-        if lastHouveringIndexPath == indexPath{ return } //reject repeatedly call
 
-        var set: NSIndexSet!
-        if let lastid = lastHouveringIndexPath { // update data source
-            scheduleToEdit.removeEmptyDay(lastid.section);
-        }
-        scheduleToEdit.addEmptyDay(indexPath.section)        
-        scheduleToEdit.addWork(BreakPart(last: 1), inIndex: indexPath);
-        if let lastid = lastHouveringIndexPath { // update cell
-            set = NSIndexSet(index: lastid.section)
-            tableView.deleteSections(set, withRowAnimation: .Fade)
-        }
-        set = NSIndexSet(index: indexPath.section)
-        tableView.insertSections(set, withRowAnimation: .None)
-        lastHouveringIndexPath = indexPath;
-        /*
-        let range = NSRange(location: 0, length: scheduleToEdit.lastDays - 1);
-        set = NSIndexSet(indexesInRange: range)
-        tableView.reloadSections(set, withRowAnimation: .Fade)
-        */
-    }
     // MARK: - View;
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -137,6 +170,7 @@ class CycleManagementVC: UIViewController {
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
         }
+        //updateAddDayButton();
         doAfterDelay(0.3, {self.tableView.reloadData()})
     }
     override func viewDidLoad() {
@@ -210,14 +244,8 @@ extension CycleManagementVC :UITableViewDataSource{
         button.showsTouchWhenHighlighted = true;
         button.titleLabel?.font = UIFont.systemFontOfSize(14);
         button.addTarget(self, action: Selector("addNewDay:"), forControlEvents: .TouchUpInside);
-        button.tag = section;
-        if (editing){
-            button.enabled = true;
-            button.hidden = false
-        }else{
-            button.enabled = false;
-            button.hidden = true;
-        }
+        button.hidden = shoudButtonBeHiddenForSeciont(section);
+        button.tag = 429 + section;
         view.addSubview(button)
         
         return view
@@ -234,12 +262,13 @@ extension CycleManagementVC :UITableViewDataSource{
         if work is BreakPart {
             cell.textLabel?.text = "休息时间"
             cell.detailTextLabel?.text = "时长：\(work.last.formattedString)";
+        }else if work is TemperalPart {
+            cell.textLabel?.text = "(temperal cell)"
+            cell.detailTextLabel?.text = ""
         }else{
             cell.textLabel?.text = work.title;
             cell.detailTextLabel?.text = work.descriptionIn24h;
         }
-
-        
         return cell;
     }
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -267,19 +296,21 @@ extension CycleManagementVC :UITableViewDataSource{
             println("should redestinated to \(destination.section),\(destination.row)")
             return destination;
         }else{
-            println("should insert a new day");
-            canntFindProperPlaceForIndexPath(proposedDestinationIndexPath);
-            let ret = NSIndexPath(forRow: 0, inSection: proposedDestinationIndexPath.section)
-            return ret;
+            println("should not move");
+            //canntFindProperPlaceForIndexPath(proposedDestinationIndexPath);
+            //let ret = NSIndexPath(forRow: 0, inSection: proposedDestinationIndexPath.section)
+            return sourceIndexPath;
         }
     }
     func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
         if fromIndexPath == toIndexPath {return}
         let workToReorder = scheduleToEdit.workForIndexPath(fromIndexPath);
         if scheduleToEdit.removeWork(fromIndexPath) { // the retrun value of this method indicate if it needs to remove the whole damn section
+
+            //let set = NSIndexSet(index: fromIndexPath.section)
+            //ableView.deleteSections(set, withRowAnimation: .Fade)
             scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
-            let set = NSIndexSet(index: fromIndexPath.section)
-            tableView.deleteSections(set, withRowAnimation: .Fade)
+            tableView.reloadSections(NSIndexSet(index: toIndexPath.section), withRowAnimation: .None)
         }else{
             scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
         }
