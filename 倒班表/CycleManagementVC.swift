@@ -338,11 +338,14 @@ extension CycleManagementVC :UITableViewDataSource{
             doAfterDelay(0.3){ //delay to avoid disturbing the cell move animation!
                 tableView.beginUpdates()
                 tableView.deleteSections(set, withRowAnimation: .Fade)
-                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: 1)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: len)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: len)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
+
                 println("*******relaoded range: \(newToIndex.section):\(len)****deleteSection:\(set.firstIndex)")
                 tableView.endUpdates();
             }
-            doAfterDelay(0.6){
+            
+            doAfterDelay(0.7){ //为了省事每次移动cell之后都会刷新所有section。这样做可能不是最好的办法。特别是从从上面删除section 插入到下面的tempdays中时的动画不是很好看。
                 self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: 0, length: self.scheduleToEdit.lastDays)), withRowAnimation: .None)
             }
         }else{
