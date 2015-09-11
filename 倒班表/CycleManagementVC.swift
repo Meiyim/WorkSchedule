@@ -139,15 +139,25 @@ class CycleManagementVC: UIViewController {
             if(id > tempDays){--id}
             print("\(tempDays) --> \(id)\n")
             scheduleToEdit.removeEmptyDay(tempDays)
+            scheduleToEdit.addEmptyDay(id);
+            tableView.beginUpdates()
             tableView.deleteSections(NSIndexSet(index: tempDays), withRowAnimation: .Right);
+            //self.tableView.moveSection(tempDays, toSection: id)
+            self.tableView.insertSections(NSIndexSet(index: id), withRowAnimation: .Right);
+            tableView.endUpdates()
+            doAfterDelay(0.3){ [unowned self] in
+            self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location:0 , length: self.scheduleToEdit.lastDays)), withRowAnimation: .None)
+            }
+        }else{
+            scheduleToEdit.addEmptyDay(id);
+            tableView.beginUpdates();
+            self.tableView.insertSections(NSIndexSet(index: id), withRowAnimation: .Right);
+            tableView.endUpdates();
+            doAfterDelay(0.3){
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location:0 , length: self.scheduleToEdit.lastDays  )), withRowAnimation: .None)
+            }
         }
-        scheduleToEdit.addEmptyDay(id);
-        doAfterDelay(0.3){ [unowned self] in
-          self.tableView.insertSections(NSIndexSet(index: id), withRowAnimation: .Right);
-        }
-        doAfterDelay(0.5){ [unowned self] in
-            self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location:0 , length: self.scheduleToEdit.lastDays )), withRowAnimation: .None)
-        }
+        
     }
 
     // MARK: - View;
@@ -199,12 +209,20 @@ extension CycleManagementVC :UITableViewDelegate{
 
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the specified item to be editable.
+        if let tempDays = scheduleToEdit.sectionOfTemperalDays() {
+            if indexPath.section == tempDays {
+                return false
+            }
+        }
         return true
     }
     // Override to support conditional rearranging of the table view.
     func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
+        if let tempDays = scheduleToEdit.sectionOfTemperalDays() {
+            if indexPath.section == tempDays {
+                return false
+            }
+        }
         return true
     }
 }
@@ -281,7 +299,6 @@ extension CycleManagementVC :UITableViewDataSource{
                 let set = NSIndexSet(index: indexPath.section)
                 tableView.deleteSections(set, withRowAnimation: .Fade) // delete the whole damn section
                 doAfterDelay(0.3, {tableView.reloadData()}) // using this asynchronous method could be a little dangerous
-                
             }else{
                 tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade); //just delet the row
             }
@@ -306,11 +323,28 @@ extension CycleManagementVC :UITableViewDataSource{
         if fromIndexPath == toIndexPath {return}
         let workToReorder = scheduleToEdit.workForIndexPath(fromIndexPath);
         if scheduleToEdit.removeWork(fromIndexPath) { // the retrun value of this method indicate if it needs to remove the whole damn section
+            var newToIndex: NSIndexPath!;
+            if(toIndexPath.section > fromIndexPath.section){  // if the move is from up to down , the destination section should decrease;
+                newToIndex = NSIndexPath(forRow: toIndexPath.row, inSection: toIndexPath.section - 1);
+            }else{
+                newToIndex = toIndexPath;
+            }
+            println("moving cell \(fromIndexPath.section),\(fromIndexPath.row) -> \(newToIndex.section),\(newToIndex.row)")
 
-            //let set = NSIndexSet(index: fromIndexPath.section)
-            //ableView.deleteSections(set, withRowAnimation: .Fade)
-            scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
-            tableView.reloadSections(NSIndexSet(index: toIndexPath.section), withRowAnimation: .None)
+            scheduleToEdit.addWork(workToReorder, inIndex: newToIndex); //newToIndex 是delete操作后应该insert的位置。toIndexPath是delete前应该insert的位置。
+            
+            let set = NSIndexSet(index: fromIndexPath.section)
+            var len = (fromIndexPath.section == newToIndex.section + 1) ? 1 : 2; // 如果就从某一天插到他上面的一天时。reload区域的长度只为1，不用reload目标下面的一天了。下面（原来）遮天可能被删掉了。或者下面就是表尾。
+            doAfterDelay(0.3){ //delay to avoid disturbing the cell move animation!
+                tableView.beginUpdates()
+                tableView.deleteSections(set, withRowAnimation: .Fade)
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: 1)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
+                println("*******relaoded range: \(newToIndex.section):\(len)****deleteSection:\(set.firstIndex)")
+                tableView.endUpdates();
+            }
+            doAfterDelay(0.6){
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: 0, length: self.scheduleToEdit.lastDays)), withRowAnimation: .None)
+            }
         }else{
             scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
         }

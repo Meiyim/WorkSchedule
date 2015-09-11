@@ -313,13 +313,12 @@ class Schedule {
         let row =  days[day.section].addWork(work);
         return NSIndexPath(forRow: row, inSection: day.section);
     }
-    func removeWork(inIndex: NSIndexPath, closuer: (()->())? = nil)->Bool{ // the return value indicated if a section is needed to be deleted too.
+    func removeWork(inIndex: NSIndexPath)->Bool{ // the return value indicated if a section is needed to be deleted too.
         let day = inIndex.section;
         let workIndex = inIndex.row;
         days[day].removeWorkatIndex(workIndex);
         println("work:\(workIndex) removed at day:\(day)");
         if days[day].parts.isEmpty || days[0].isTemperaDay {
-            closuer?();
             removeEmptyDay(day);
             return true;
         }
