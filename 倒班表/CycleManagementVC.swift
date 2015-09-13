@@ -39,16 +39,14 @@ class CycleManagementVC: UIViewController {
     }*/
 
     @IBAction func moveRiseUpView(sender: AnyObject){
+        println("did reveived gesture");
         if let recognizer = sender as? UIGestureRecognizer{
-            let position = recognizer.locationInView(riseUpTableView); //taping somewhere else
-            let indexPath = riseUpTableView.indexPathForRowAtPoint(position);
-            if indexPath != nil {
-                return; // cancel move if toucing the riseup cell
-            }
+            let position = recognizer.locationInView(view); //taping somewhere else
+            println(position);
         }else{ // tapping the add button
             
         }
-
+        println(sender);
         let riser = CABasicAnimation(keyPath: "position")
         riser.removedOnCompletion = false;
         riser.fillMode = kCAFillModeForwards;
@@ -75,8 +73,9 @@ class CycleManagementVC: UIViewController {
             riseButton.enabled = false;
             let rec = UITapGestureRecognizer(target: self, action: Selector("moveRiseUpView:"))
             rec.cancelsTouchesInView = false;
-            rec.delegate = self
-            view.addGestureRecognizer(rec);
+            rec.delaysTouchesBegan = true
+            rec.delaysTouchesEnded = true;
+            tableView.addGestureRecognizer(rec);
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: riseUpView.frame.height, right: 0)
         }else{
             riseUpView.layer.removeAllAnimations(); // set status when is down
@@ -84,8 +83,9 @@ class CycleManagementVC: UIViewController {
             riseUpView.frame.origin.y = view.bounds.height - 44;
             isRiseUp = true;
             riseButton.enabled = true;
-            let rec = view.gestureRecognizers?[0] as! UITapGestureRecognizer;
-            view.removeGestureRecognizer(rec);
+            let gests = tableView.gestureRecognizers! as! [UIGestureRecognizer];
+            let rec = gests.last! as! UITapGestureRecognizer;
+            tableView.removeGestureRecognizer(rec);
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
         }
     }
@@ -338,9 +338,7 @@ extension CycleManagementVC :UITableViewDataSource{
             doAfterDelay(0.3){ //delay to avoid disturbing the cell move animation!
                 tableView.beginUpdates()
                 tableView.deleteSections(set, withRowAnimation: .Fade)
-                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: len)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
-                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: len)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
-
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: len)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。 
                 println("*******relaoded range: \(newToIndex.section):\(len)****deleteSection:\(set.firstIndex)")
                 tableView.endUpdates();
             }
@@ -360,21 +358,6 @@ extension CycleManagementVC: UINavigationBarDelegate{ //deal with the status bar
     func positionForBar(bar: UIBarPositioning) -> UIBarPosition {
         return .TopAttached
     }
-}
-
-extension CycleManagementVC: UIGestureRecognizerDelegate{
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
-        let views = riseUpView.subviews as! [UIView];
-        if let ok = find(views, touch.view) {
-            return false
-        }else{
-            return true;
-        }
-        
-    }
-    
-
-
 }
 
 extension CycleManagementVC: RiseUpViewDelegate {
