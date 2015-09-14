@@ -46,7 +46,6 @@ class CycleManagementVC: UIViewController {
         }else{ // tapping the add button
             
         }
-        println(sender);
         let riser = CABasicAnimation(keyPath: "position")
         riser.removedOnCompletion = false;
         riser.fillMode = kCAFillModeForwards;
@@ -63,7 +62,13 @@ class CycleManagementVC: UIViewController {
         riser.delegate = self;
         riseUpView.layer.addAnimation(riser, forKey: "riseUpViewMove");
     }
-
+    func receiveDragging(rec: UIPanGestureRecognizer){
+        if isRiseUp {return}
+        println("panning received")
+        if rec.state == .Began{
+            moveRiseUpView(rec);
+        }
+    }
     override func animationDidStop(anim: CAAnimation!, finished flag: Bool) {
         if isRiseUp {
             riseUpView.layer.removeAllAnimations(); //set status when is up
@@ -71,11 +76,14 @@ class CycleManagementVC: UIViewController {
             riseUpView.center.y = view.bounds.height - (riseUpView.bounds.height / 2);
             isRiseUp = false;
             riseButton.enabled = false;
-            let rec = UITapGestureRecognizer(target: self, action: Selector("moveRiseUpView:"))
-            rec.cancelsTouchesInView = true;
-            rec.delaysTouchesBegan = true //不完美的解决方法
-            rec.delaysTouchesEnded = true;
-            tableView.addGestureRecognizer(rec);
+            
+            // enabling the GRs;
+            let arr = tableView.gestureRecognizers;
+            println(arr!.count);
+            let rec2 = arr!.last! as! UIPanGestureRecognizer ; // the pan GR;
+            let rec = arr![arr!.count - 2] as! UITapGestureRecognizer; // the tap GR;
+            rec2.enabled = true;
+            rec.enabled = true;
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: riseUpView.frame.height, right: 0)
         }else{
             riseUpView.layer.removeAllAnimations(); // set status when is down
@@ -83,9 +91,13 @@ class CycleManagementVC: UIViewController {
             riseUpView.frame.origin.y = view.bounds.height - 44;
             isRiseUp = true;
             riseButton.enabled = true;
-            let gests = tableView.gestureRecognizers! as! [UIGestureRecognizer];
-            let rec = gests.last! as! UITapGestureRecognizer;
-            tableView.removeGestureRecognizer(rec);
+            
+            //disabling the GRs
+            let arr = tableView.gestureRecognizers;
+            let rec2 = arr!.last! as! UIPanGestureRecognizer ; // the pan GR;
+            let rec = arr![arr!.count - 2] as! UITapGestureRecognizer; // the tap GR;
+            rec2.enabled = false;
+            rec.enabled = false;
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
         }
     }
@@ -192,7 +204,20 @@ class CycleManagementVC: UIViewController {
         riseUpView.delegate = self;
         scheduleToEdit.isInEdittingMode = false
         navigationItem.rightBarButtonItem = editButtonItem();
-        //tableView.setEditing(true, animated: true);
+        
+        //----adding the gesture recoginzers
+        let rec = UITapGestureRecognizer(target: self, action: Selector("moveRiseUpView:"))
+        rec.cancelsTouchesInView = false;
+        rec.delaysTouchesBegan = true;
+        rec.delaysTouchesEnded = true;
+        rec.enabled = false;
+        let rec2 = UIPanGestureRecognizer(target: self, action: Selector("receiveDragging:"))
+        rec2.cancelsTouchesInView = false;
+        rec2.delaysTouchesBegan = true;
+        rec2.delaysTouchesEnded = true;
+        rec2.enabled = false;
+        tableView.addGestureRecognizer(rec);
+        tableView.addGestureRecognizer(rec2);
     }
     /*
     // MARK: - Navigation
