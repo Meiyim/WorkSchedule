@@ -72,8 +72,8 @@ class CycleManagementVC: UIViewController {
             isRiseUp = false;
             riseButton.enabled = false;
             let rec = UITapGestureRecognizer(target: self, action: Selector("moveRiseUpView:"))
-            rec.cancelsTouchesInView = false;
-            rec.delaysTouchesBegan = true
+            rec.cancelsTouchesInView = true;
+            rec.delaysTouchesBegan = true //不完美的解决方法
             rec.delaysTouchesEnded = true;
             tableView.addGestureRecognizer(rec);
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: riseUpView.frame.height, right: 0)
@@ -334,21 +334,26 @@ extension CycleManagementVC :UITableViewDataSource{
             scheduleToEdit.addWork(workToReorder, inIndex: newToIndex); //newToIndex 是delete操作后应该insert的位置。toIndexPath是delete前应该insert的位置。
             
             let set = NSIndexSet(index: fromIndexPath.section)
-            var len = (fromIndexPath.section == newToIndex.section + 1) ? 1 : 2; // 如果就从某一天插到他上面的一天时。reload区域的长度只为1，不用reload目标下面的一天了。下面（原来）遮天可能被删掉了。或者下面就是表尾。
             doAfterDelay(0.3){ //delay to avoid disturbing the cell move animation!
                 tableView.beginUpdates()
                 tableView.deleteSections(set, withRowAnimation: .Fade)
-                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: len)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。 
-                println("*******relaoded range: \(newToIndex.section):\(len)****deleteSection:\(set.firstIndex)")
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: 1)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
+                println("*******relaoded range: \(newToIndex.section):\(1)****deleteSection:\(set.firstIndex)")
                 tableView.endUpdates();
             }
             
-            doAfterDelay(0.7){ //为了省事每次移动cell之后都会刷新所有section。这样做可能不是最好的办法。特别是从从上面删除section 插入到下面的tempdays中时的动画不是很好看。
+            doAfterDelay(0.6){ //为了省事每次移动cell之后都会刷新所有section。这样做可能不是最好的办法。特别是从从上面删除section 插入到下面的tempdays中时的动画不是很好看。
                 self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: 0, length: self.scheduleToEdit.lastDays)), withRowAnimation: .None)
             }
         }else{
+
             scheduleToEdit.addWork(workToReorder, inIndex: toIndexPath);
-        }
+            doAfterDelay(0.3){
+                tableView.reloadSections(NSIndexSet(index: toIndexPath.section), withRowAnimation: .Fade);
+            }
+            doAfterDelay(0.6){ //为了及时更新各个section 的header。不断地reload。这样做应该不是最好的办法
+                self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: 0, length: self.scheduleToEdit.lastDays)), withRowAnimation: .None)
+            }        }
 
     }
     
