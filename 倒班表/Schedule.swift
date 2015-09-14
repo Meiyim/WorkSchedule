@@ -7,114 +7,9 @@
 //
 
 import Foundation
-class Part: NSObject, NSCoding{
-    var title = "";
-    var isWork = true;
-    var shouldRemind = false;
-    var last: NSTimeInterval{
-        get{
-            return end - begin + 1;
-        }
-    }
 
-    var begin: NSTimeInterval = 0
-    var end: NSTimeInterval = 0
-    var beginDate: NSDate = NSDate(){
-        didSet{
-            begin = (beginDate.timeIntervalSinceReferenceDate  ) % (3600*24.0) ;
-            println("did set2");
-        }
-    };
-    var endDate: NSDate = NSDate(){
-        didSet{
-            end = (endDate.timeIntervalSinceReferenceDate   ) % (3600*24.0) ;
-            if end < begin {
-                end += 3600 * 24;
-            }
-        }
-    };
-    var descriptionIn24h: String{
-        return String(format: "%@ ~ %@",
-            begin.formattedString,end.formattedString);
-    }
-    override init(){
-        super.init();
-    }
-    init(name: String,beginDate: NSDate, endDate: NSDate, shouldRemind: Bool = false){
-        title = name;
-        self.beginDate = beginDate;
-        self.endDate = endDate;
-        self.shouldRemind = shouldRemind;
-        super.init();
-        begin = (beginDate.timeIntervalSinceReferenceDate) % (3600*24.0);
-        end = (endDate.timeIntervalSinceReferenceDate) % (3600*24.0)
-        println("did set1");
-        if end < begin {
-            end += 24 * 3600;
-        }
-    }
-    func isConflictWithWork(work: Part)->Bool {
-        if(self.end < work.begin || self.begin > work.end){
-            return false;
-        }
-        return true;
-    }
-    //MARK: - NSCoding
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(title, forKey: "title")
-        aCoder.encodeBool(isWork, forKey: "isWork")
-        aCoder.encodeBool(shouldRemind, forKey: "shouldRemind")
-        //aCoder.encodeObject(beginDate, forKey: "beginDate")
-        //aCoder.encodeObject(endDate, forKey: "endDate")
-        aCoder.encodeDouble(begin, forKey: "begin"); // only save time intervals!
-        aCoder.encodeDouble(end, forKey: "end");
-    }
-    required init(coder aDecoder: NSCoder) {
-        title = aDecoder.decodeObjectForKey("title") as! String
-        isWork = aDecoder.decodeBoolForKey("isWork")
-        shouldRemind = aDecoder.decodeBoolForKey("shouldRemind");
-        begin = aDecoder.decodeDoubleForKey("begin");
-        end = aDecoder.decodeDoubleForKey("end");
-        beginDate = NSDate(timeIntervalSinceReferenceDate: begin); //all in GMT timeZone
-        endDate = NSDate(timeIntervalSinceReferenceDate: end);
-        super.init();
-    }
-
-}
-class TemperalPart: Part{
-    override init() {
-        super.init();
-        end = 88888888;
-        begin = 88888888;
-    }
-    required init(coder aDecoder: NSCoder) {
-        super.init();
-        end = 88888888;
-        begin = 88888888;
-    }
-}
-class BreakPart: Part{
-    var lastValue: NSTimeInterval = 0.0;
-    init(last: Double){
-        super.init();
-        end = 88888888;
-        begin = 88888888;
-        lastValue = last;
-        
-    }
-    override var last: NSTimeInterval{
-        get{
-            return lastValue;
-        }
-    }
-    required init(coder aDecoder: NSCoder) {
-        super.init();
-        end = 88888888;
-        begin = 88888888;
-    }
-}
-class Schedule {
-    class Day{
+class Schedule: NSObject, NSCoding {
+    class Day: NSObject, NSCoding{
         var parts = [Part]();
         weak var yesterday: Day?;
         var tail: NSTimeInterval?{
@@ -124,6 +19,14 @@ class Schedule {
                 return nil;
             }
         };
+        //MARK: - save & loads
+        required init(coder aDecoder: NSCoder) {
+            parts = aDecoder.decodeObjectForKey("parts") as! [Part] //wont encode yesterday property when encoding
+        }
+        func encodeWithCoder(aCoder: NSCoder) {
+            aCoder.encodeObject(parts, forKey: "parts");
+        }
+        //MARK: - utilities
         var intervals = [NSTimeInterval]();
         var isTemperaDay = false
         init(isTempera: Bool = false){
@@ -197,6 +100,7 @@ class Schedule {
 
 
     var title = "";
+    private var days = [Day]();
     var isInEdittingMode = false{
         didSet{
             if isInEdittingMode == false {
@@ -206,10 +110,23 @@ class Schedule {
             }
         }
     };
-    private var days = [Day]();
-    
-    init(){
+
+    //MARK: - load&save
+    override init(){
         //days.append(Day());
+    }
+    required init(coder aDecoder: NSCoder) {
+        isInEdittingMode = false;
+        title = aDecoder.decodeObjectForKey("title") as! String;
+        days = aDecoder.decodeObjectForKey("days") as! [Day];
+        for(var i: Int = 1; i != days.count ; ++i){
+            days[i].yesterday = days[i-1];
+        }
+        super.init()
+    }
+    func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeObject(days, forKey: "days");
+        aCoder.encodeObject(title, forKey: "title");
     }
     //MARK: - querry method
     func sectionOfTemperalDays() -> Int? {
@@ -254,6 +171,11 @@ class Schedule {
     var lastDays: Int {
         get{return days.count;}
     }
+    //MARK: - clearAll
+    func clearAll(){
+        days.removeAll(keepCapacity: false);
+        
+    }
     //MARK: - addNew Method --- this method can be used in display mode;
     func addEmptyDay(id: Int){
         let dayToInsert = Day(isTempera: true);
@@ -282,18 +204,12 @@ class Schedule {
         return nil;
     }
     //MARK: - edit method----this mothod must be used in editting mode!
-    /*
-    func isWorkConflictWithIndexPath(indexPath: NSIndexPath, work: Part) -> Bool{
-        assert(isInEdittingMode, "this method must be envoked in Editting mode!");
-        return days[indexPath.section].isWorkConflict(work);
-    }*/
     func positionForWork(work: Part, forIndex indexPath: NSIndexPath) -> NSIndexPath?{
         if let row = days[indexPath.section].positionBeforeIndexForWork(work){
             return NSIndexPath(forRow: row, inSection: indexPath.section)
         }
         return nil;
     }
-
     func removeEmptyDay(day: Int){
         assert(isInEdittingMode, "this method must be envoked in Editting mode!");
         assert(days[day].parts.isEmpty || days[day].isTemperaDay, "must ensure removing a emptyDay or a temperal day")
@@ -306,8 +222,6 @@ class Schedule {
         }
         days.removeAtIndex(day);
     }
-
-
     func addWork(work: Part, inIndex day: NSIndexPath)->NSIndexPath?{
         assert(isInEdittingMode, "this method must be invoked in Editting mode!");
         let row =  days[day.section].addWork(work);
@@ -327,30 +241,4 @@ class Schedule {
     //MARK: - utilities
 
     
-}
-class WorksLib {
-    var lib = [Part]()
-}
-class DataLib {
-    var worksLib = WorksLib();
-    var scheduleLib = [Schedule]();
-    func save(){
-        let data = NSMutableData();
-        let archiver = NSKeyedArchiver(forWritingWithMutableData: data)
-        archiver.encodeObject(worksLib.lib, forKey: "WorksLib")
-        archiver.finishEncoding();
-        data.writeToFile(dataFilePath(), atomically: true);
-    }
-    
-    func load(){
-        let path = dataFilePath();
-        if NSFileManager.defaultManager().fileExistsAtPath(path){
-            if let data = NSData(contentsOfFile: path){
-                let unarchiver = NSKeyedUnarchiver(forReadingWithData: data)
-                let works = unarchiver.decodeObjectForKey("WorksLib") as! [Part]
-                worksLib.lib = works
-                unarchiver.finishDecoding();
-            }
-        }
-    }
 }

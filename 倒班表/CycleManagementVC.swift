@@ -33,11 +33,23 @@ class CycleManagementVC: UIViewController {
     @IBOutlet weak var riseUpTableView: UITableView!
 
     // MARK: - Actions
-    /*
-    @IBAction func cancel(sender: AnyObject) {
-        dismissViewControllerAnimated(true, completion: nil);
-    }*/
 
+
+    @IBAction func clearAllWorks(sender: AnyObject) {
+        let alert = UIAlertController(title: "清空倒班表吗？", message: "", preferredStyle: .ActionSheet) //i18n
+        let action1 = UIAlertAction(title: "清空", style: .Destructive, handler: { _ in
+            let days = self.scheduleToEdit.lastDays;
+            self.scheduleToEdit.clearAll();
+            self.tableView.deleteSections(NSIndexSet(indexesInRange: NSRange(location: 0, length: days)), withRowAnimation: .Fade);
+        })
+        let action2 = UIAlertAction(title: "取消", style: .Cancel, handler: {_ in });
+        alert.addAction(action1)
+        alert.addAction(action2)
+        presentViewController(alert, animated: true, completion: nil);
+        
+        
+
+    }
     @IBAction func moveRiseUpView(sender: AnyObject){
         println("did reveived gesture");
         if let recognizer = sender as? UIGestureRecognizer{
@@ -186,9 +198,11 @@ class CycleManagementVC: UIViewController {
         }
 
         if editing {
+            navigationItem.hidesBackButton = true;
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
         }else{
+            navigationItem.hidesBackButton = false;
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
         }
@@ -234,6 +248,9 @@ extension CycleManagementVC :UITableViewDelegate{
 
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        if !editing{
+            return false;
+        }
         if let tempDays = scheduleToEdit.sectionOfTemperalDays() {
             if indexPath.section == tempDays {
                 return false

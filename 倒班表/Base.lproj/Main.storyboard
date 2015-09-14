@@ -204,11 +204,15 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fbW-ve-36a" userLabel="riseUpView" customClass="RiseUpView" customModule="倒班表" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="556" width="600" height="220"/>
                                 <subviews>
-                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzH-Sz-VQZ">
+                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.79999999999999982" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzH-Sz-VQZ">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                                         <items>
-                                            <barButtonItem width="300" systemItem="trash" id="E88-lw-gLF"/>
-                                            <barButtonItem title="应用倒班周期" id="Mkg-R5-7eh"/>
+                                            <barButtonItem systemItem="trash" id="E88-lw-gLF">
+                                                <connections>
+                                                    <action selector="clearAllWorks:" destination="qcf-Bb-zLO" id="IfX-LS-sSv"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="XH7-dE-P7S"/>
                                             <barButtonItem systemItem="add" id="3IH-Vs-mhb">
                                                 <connections>
                                                     <action selector="moveRiseUpView:" destination="qcf-Bb-zLO" id="pPq-WN-kga"/>
@@ -255,13 +259,11 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="applyButton" destination="Mkg-R5-7eh" id="cgG-IP-BSU"/>
                         <outlet property="riseButton" destination="3IH-Vs-mhb" id="cjc-rb-RyS"/>
                         <outlet property="riseUpTableView" destination="yJ7-Cr-Xm2" id="oPq-cx-eql"/>
                         <outlet property="riseUpView" destination="fbW-ve-36a" id="HDL-hE-mN0"/>
                         <outlet property="tableView" destination="DWV-Z2-8L2" id="rSt-Vt-v1g"/>
                         <outlet property="toolBar" destination="MzH-Sz-VQZ" id="mH1-4q-X94"/>
-                        <outlet property="trashButton" destination="E88-lw-gLF" id="P3m-7n-Rz5"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Sf-QH-xbO" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -413,11 +415,14 @@
                                 <action selector="cancel:" destination="0lg-pj-OS2" id="NpU-JZ-AYG"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="done" id="r79-qp-An1"/>
+                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="done" id="r79-qp-An1">
+                            <connections>
+                                <action selector="done:" destination="0lg-pj-OS2" id="x2k-1t-Aqn"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="applyButton" destination="jlk-xV-agb" id="zxw-8Q-Ozd"/>
-                        <outlet property="doneButton" destination="r79-qp-An1" id="VfJ-nd-Ec6"/>
                         <outlet property="textField" destination="cJm-ne-qXG" id="wg9-bS-WZB"/>
                     </connections>
                 </tableViewController>
