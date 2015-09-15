@@ -13,6 +13,7 @@ class CycleManagementVC: UIViewController {
 
     
     // MARK: - Properties
+    var scheduleBackup: Schedule!;
     var scheduleToEdit :Schedule!;
     var worksLib: WorksLib!;
     var isRiseUp = true;
@@ -23,8 +24,6 @@ class CycleManagementVC: UIViewController {
         return ret;}()
     // MARK: - Outlets
     @IBOutlet weak var riseButton: UIBarButtonItem!
-    @IBOutlet weak var doneButton: UIBarButtonItem!
-    @IBOutlet weak var applyButton: UIBarButtonItem!
     @IBOutlet weak var trashButton: UIBarButtonItem!
     @IBOutlet weak var toolBar: UIToolbar!
     @IBOutlet weak var riseUpView: RiseUpView!
@@ -34,7 +33,7 @@ class CycleManagementVC: UIViewController {
 
     // MARK: - Actions
 
-
+    
     @IBAction func clearAllWorks(sender: AnyObject) {
         let alert = UIAlertController(title: "清空倒班表吗？", message: "", preferredStyle: .ActionSheet) //i18n
         let action1 = UIAlertAction(title: "清空", style: .Destructive, handler: { _ in
@@ -112,6 +111,19 @@ class CycleManagementVC: UIViewController {
             rec.enabled = false;
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
         }
+    }
+    func cancel(sender: UIBarButtonItem){
+        let alert = UIAlertController(title: "放弃所有更改？", message: "", preferredStyle: .ActionSheet) //i18n
+        let action1 = UIAlertAction(title: "放弃", style: .Destructive, handler: { _ in
+            self.scheduleToEdit = self.scheduleBackup.mutableCopy() as! Schedule;
+            self.setEditing(false, animated: true);
+        })
+        let action2 = UIAlertAction(title: "取消", style: .Cancel, handler: {_ in });
+        alert.addAction(action1)
+        alert.addAction(action2)
+        presentViewController(alert, animated: true, completion: nil);
+        
+        
     }
     // MARK: - utilities
     private func shoudButtonBeHiddenForSeciont(section: Int) -> Bool{
@@ -192,17 +204,21 @@ class CycleManagementVC: UIViewController {
     override func setEditing(editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         tableView.setEditing(editing, animated: animated);
+        trashButton.enabled = editing;
         scheduleToEdit.isInEdittingMode = editing;
         if !isRiseUp {
             moveRiseUpView(self);
         }
 
         if editing {
-            navigationItem.hidesBackButton = true;
+            navigationItem.hidesBackButton = true; //edit button pressed
+            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: Selector("cancel:"))
+            scheduleBackup = scheduleToEdit.mutableCopy() as! Schedule;
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
         }else{
-            navigationItem.hidesBackButton = false;
+            navigationItem.hidesBackButton = false; // done button pressed
+            navigationItem.leftBarButtonItem = nil;
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
         }

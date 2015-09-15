@@ -22,7 +22,7 @@ func timeZoneOffset()->Double {
 extension NSTimeInterval {
     var formattedString: String{
         
-        assert(self < 3600*24*2 && self > 0, "Time Interval should less than 24h")
+        assert(self < 3600*24*2 && self >= 0, "Time Interval should less than 24h")
         var time = self;
         if time > 3600*24 {time -= 3600*24.0}
         let h: Int = Int(time / 3600);
@@ -30,6 +30,14 @@ extension NSTimeInterval {
         let str = String(format: "%2d : %02d", h, min)
         return str;
     }
+}
+
+func arrayCopy< T where T: NSObject, T: NSMutableCopying >(arr: Array<T> ) -> Array<T> { //一个泛型的数组复制函数。实现对容器元素的逐一深拷贝。要求元素满足NSMutableCopying协议。
+    var ret = Array<T>()
+    for e in arr {
+        ret.append(e.mutableCopy() as! T);
+    }
+    return ret;
 }
 
 func doAfterDelay(seconds: Double, closure: ()->()){ // GCD framework!

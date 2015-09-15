@@ -207,7 +207,7 @@
                                     <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.79999999999999982" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzH-Sz-VQZ">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                                         <items>
-                                            <barButtonItem systemItem="trash" id="E88-lw-gLF">
+                                            <barButtonItem enabled="NO" systemItem="trash" id="E88-lw-gLF">
                                                 <connections>
                                                     <action selector="clearAllWorks:" destination="qcf-Bb-zLO" id="IfX-LS-sSv"/>
                                                 </connections>
@@ -264,6 +264,7 @@
                         <outlet property="riseUpView" destination="fbW-ve-36a" id="HDL-hE-mN0"/>
                         <outlet property="tableView" destination="DWV-Z2-8L2" id="rSt-Vt-v1g"/>
                         <outlet property="toolBar" destination="MzH-Sz-VQZ" id="mH1-4q-X94"/>
+                        <outlet property="trashButton" destination="E88-lw-gLF" id="NV3-R6-p3d"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Sf-QH-xbO" userLabel="First Responder" sceneMemberID="firstResponder"/>

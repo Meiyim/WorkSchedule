@@ -8,8 +8,8 @@
 
 import Foundation
 
-class Schedule: NSObject, NSCoding {
-    class Day: NSObject, NSCoding{
+class Schedule: NSObject, NSCoding, NSMutableCopying {
+    class Day: NSObject, NSCoding, NSMutableCopying{
         var parts = [Part]();
         weak var yesterday: Day?;
         var tail: NSTimeInterval?{
@@ -26,15 +26,24 @@ class Schedule: NSObject, NSCoding {
         func encodeWithCoder(aCoder: NSCoder) {
             aCoder.encodeObject(parts, forKey: "parts");
         }
-        //MARK: - utilities
-        var intervals = [NSTimeInterval]();
-        var isTemperaDay = false
+        //MARK: - copying
+        func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
+            var ret = Day();
+            ret.parts = arrayCopy(self.parts)
+            ret.yesterday = nil;
+            return ret;
+        }
+        //initialization
         init(isTempera: Bool = false){
             if isTempera {
                 self.isTemperaDay = true;
                 parts.append(TemperalPart());
             }
         }
+        //MARK: - utilities
+        var intervals = [NSTimeInterval]();
+        var isTemperaDay = false
+
         func isWorkConflict(thiswork: Part) -> Bool{
             for work in parts{
                 if work.isConflictWithWork(thiswork) {
@@ -127,6 +136,17 @@ class Schedule: NSObject, NSCoding {
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(days, forKey: "days");
         aCoder.encodeObject(title, forKey: "title");
+    }
+    //MARK: - NSCopying
+    func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
+        var ret = Schedule();
+        ret.title = self.title
+        ret.isInEdittingMode = self.isInEdittingMode
+        ret.days = arrayCopy(self.days);
+        for i in 1..<ret.days.count {
+            ret.days[i].yesterday = ret.days[i-1] //must reConfigue the yesterday for each day in days;
+        }
+        return ret;
     }
     //MARK: - querry method
     func sectionOfTemperalDays() -> Int? {

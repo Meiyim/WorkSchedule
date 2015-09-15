@@ -7,16 +7,10 @@
 //
 
 import Foundation
-class Part: NSObject, NSCoding{
+class Part: NSObject, NSCoding, NSMutableCopying{
     var title = "";
     var isWork = true;
     var shouldRemind = false;
-    var last: NSTimeInterval{
-        get{
-            return end - begin + 1;
-        }
-    }
-    
     var begin: NSTimeInterval = 0
     var end: NSTimeInterval = 0
     var beginDate: NSDate = NSDate(){
@@ -33,6 +27,13 @@ class Part: NSObject, NSCoding{
             }
         }
     };
+    
+    
+    var last: NSTimeInterval{
+        get{
+            return end - begin + 1;
+        }
+    }
     var descriptionIn24h: String{
         return String(format: "%@ ~ %@",
             begin.formattedString,end.formattedString);
@@ -78,6 +79,18 @@ class Part: NSObject, NSCoding{
         beginDate = NSDate(timeIntervalSinceReferenceDate: begin); //all in GMT timeZone
         endDate = NSDate(timeIntervalSinceReferenceDate: end);
         super.init();
+    }
+    //MAKR: - NSMutableCopying
+    func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
+        var ret = Part()
+        ret.title = self.title;
+        ret.isWork = self.isWork;
+        ret.shouldRemind = self.shouldRemind;
+        ret.begin = self.begin;
+        ret.beginDate = self.beginDate;
+        ret.end = self.end
+        ret.endDate  = self.endDate;
+        return ret;
     }
     
 }
