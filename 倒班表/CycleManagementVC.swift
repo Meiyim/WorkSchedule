@@ -228,7 +228,7 @@ class CycleManagementVC: UIViewController {
                 tableView.endUpdates();
             }else{
                 let ids = self.scheduleToEdit.indexPathOfIntervals();
-                tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Bottom)
+                tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom)
             }
 
         }
