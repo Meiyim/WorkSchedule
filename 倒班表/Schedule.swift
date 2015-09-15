@@ -259,7 +259,7 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         let workIndex = inIndex.row;
         days[day].removeWorkatIndex(workIndex);
         println("work:\(workIndex) removed at day:\(day)");
-        if days[day].parts.isEmpty || days[0].isTemperaDay {
+        if days[day].parts.isEmpty || days[day].isTemperaDay {
             removeEmptyDay(day);
             return true;
         }

@@ -116,6 +116,7 @@ class CycleManagementVC: UIViewController {
         let alert = UIAlertController(title: "放弃所有更改？", message: "", preferredStyle: .ActionSheet) //i18n
         let action1 = UIAlertAction(title: "放弃", style: .Destructive, handler: { _ in
             self.scheduleToEdit = self.scheduleBackup.mutableCopy() as! Schedule;
+            self.tableView.reloadData();
             self.setEditing(false, animated: true);
         })
         let action2 = UIAlertAction(title: "取消", style: .Cancel, handler: {_ in });
