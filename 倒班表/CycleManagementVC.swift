@@ -203,9 +203,10 @@ class CycleManagementVC: UIViewController {
     }
     override func setEditing(editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
+        var temperalDaySection = scheduleToEdit.sectionOfTemperalDays();
         tableView.setEditing(editing, animated: animated);
         trashButton.enabled = editing;
-        scheduleToEdit.isInEdittingMode = editing;
+        scheduleToEdit.isInEdittingMode = editing; //data Source Chaged in Here
         if !isRiseUp {
             moveRiseUpView(self);
         }
@@ -219,8 +220,17 @@ class CycleManagementVC: UIViewController {
         }else{
             navigationItem.hidesBackButton = false; // done button pressed
             navigationItem.leftBarButtonItem = nil;
-            let ids = self.scheduleToEdit.indexPathOfIntervals();
-            self.tableView.insertRowsAtIndexPaths(ids, withRowAnimation: .Bottom);
+            if let idToDelete = temperalDaySection{ //如果切换回到非editing的时候，tabel中有temperal day。在这里将其删除。以下逻辑中reloadsection用了两段。将被删除的section隔开了。
+                tableView.beginUpdates();
+                tableView.deleteSections(NSIndexSet(index: idToDelete), withRowAnimation: .Bottom);
+                tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: 0, length: idToDelete)), withRowAnimation: .Bottom);
+                tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: idToDelete + 1, length: scheduleToEdit.lastDays - idToDelete)), withRowAnimation: .Bottom)
+                tableView.endUpdates();
+            }else{
+                let ids = self.scheduleToEdit.indexPathOfIntervals();
+                tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Bottom)
+            }
+
         }
         //updateAddDayButton();
         doAfterDelay(0.3, {self.tableView.reloadData()})

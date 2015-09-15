@@ -113,9 +113,16 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
     var isInEdittingMode = false{
         didSet{
             if isInEdittingMode == false {
+                for i in 0..<lastDays { //clear the temperal days
+                    if days[i].isTemperaDay {
+                        removeEmptyDay(i);
+                        break;
+                    }
+                }
                 for day in days{
                     day.checkNumberOfIntervals();
                 }
+
             }
         }
     };
@@ -231,7 +238,7 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         return nil;
     }
     func removeEmptyDay(day: Int){
-        assert(isInEdittingMode, "this method must be envoked in Editting mode!");
+        //(isInEdittingMode, "this method must be envoked in Editting mode!");
         assert(days[day].parts.isEmpty || days[day].isTemperaDay, "must ensure removing a emptyDay or a temperal day")
         if day !=  days.count - 1{
             if day == 0 {
