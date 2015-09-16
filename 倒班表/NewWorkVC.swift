@@ -7,7 +7,7 @@
 //
 
 import UIKit
-protocol NewWorkVCDelegate{
+protocol NewWorkVCDelegate: class{
     func appendNewWork(work: Part);
     func editWork(work: Part);
 }
@@ -47,7 +47,7 @@ class NewWorkVC: UITableViewController {
             return 0;
         }
     }
-    var delegate: NewWorkVCDelegate?
+    weak var delegate: NewWorkVCDelegate?
     var timePickerIsVisible = false;
     var timePickerRow = 5;
     //Mark: - Outlets

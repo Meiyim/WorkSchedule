@@ -94,7 +94,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ScheduleCell" textLabel="44i-lS-quU" style="IBUITableViewCellStyleDefault" id="sjf-5T-dC0">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" reuseIdentifier="ScheduleCell" textLabel="44i-lS-quU" style="IBUITableViewCellStyleDefault" id="sjf-5T-dC0">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="sjf-5T-dC0" id="4Yc-kd-GIe">
                                     <autoresizingMask key="autoresizingMask"/>
@@ -292,6 +292,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     <connections>
+                                                        <action selector="textFieldEndTyping:" destination="0lg-pj-OS2" eventType="editingDidEndOnExit" id="cTp-cJ-Pwo"/>
                                                         <outlet property="delegate" destination="0lg-pj-OS2" id="Ovb-fo-7LI"/>
                                                     </connections>
                                                 </textField>
@@ -416,14 +417,15 @@
                                 <action selector="cancel:" destination="0lg-pj-OS2" id="NpU-JZ-AYG"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="done" id="r79-qp-An1">
+                        <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="save" id="r79-qp-An1">
                             <connections>
-                                <action selector="done:" destination="0lg-pj-OS2" id="x2k-1t-Aqn"/>
+                                <action selector="done:" destination="0lg-pj-OS2" id="8qa-pI-fsj"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="applyButton" destination="jlk-xV-agb" id="zxw-8Q-Ozd"/>
+                        <outlet property="doneButton" destination="r79-qp-An1" id="28b-WK-JIb"/>
                         <outlet property="textField" destination="cJm-ne-qXG" id="wg9-bS-WZB"/>
                     </connections>
                 </tableViewController>

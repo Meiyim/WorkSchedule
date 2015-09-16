@@ -14,14 +14,21 @@ class WorksLib {
 class DataLib {
     var worksLib = WorksLib();
     var scheduleLib = [Schedule]();
+    weak var scheduleNowApplying: Schedule?
+    private var nowUsingIndex: Int?;
     func save(){
         let worksLibData = NSMutableData();
         let archiver = NSKeyedArchiver(forWritingWithMutableData: worksLibData)
         archiver.encodeObject(worksLib.lib, forKey: "WorksLib")
         archiver.encodeObject(scheduleLib, forKey: "ScheduleLib");
-        archiver.finishEncoding();
         worksLibData.writeToFile(dataFilePath(), atomically: true);
-    
+        if let _sched = scheduleNowApplying {
+            nowUsingIndex = find(scheduleLib, _sched )
+            archiver.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
+        }else{
+            archiver.encodeInteger(-1, forKey: "nowUsingIndex")
+        }
+        archiver.finishEncoding();
     }
     
     func load(){
@@ -34,6 +41,10 @@ class DataLib {
                 }
                 if let data1 = unarchiver.decodeObjectForKey("ScheduleLib") as? [Schedule]{
                     scheduleLib = data1
+                }
+                let integer = unarchiver.decodeIntegerForKey("nowUsingIndex")
+                if integer != -1 {
+                    nowUsingIndex = integer;
                 }
                 unarchiver.finishDecoding();
             }

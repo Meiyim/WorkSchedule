@@ -144,14 +144,28 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         aCoder.encodeObject(days, forKey: "days");
         aCoder.encodeObject(title, forKey: "title");
     }
+    //MARK: - display
+    var displaySummery: String{
+        get{
+            return String(format: "总共%d天", lastDays) //i18n
+        }
+    }
+    var okToUse: Bool {
+        return lastDays != 0
+    }
     //MARK: - NSCopying
     func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
+        if days.isEmpty  { return nil}
         var ret = Schedule();
         ret.title = self.title
         ret.isInEdittingMode = self.isInEdittingMode
         ret.days = arrayCopy(self.days);
-        for i in 1..<ret.days.count {
-            ret.days[i].yesterday = ret.days[i-1] //must reConfigue the yesterday for each day in days;
+        if days.count == 1{
+            return ret;
+        }else{
+            for i in 0..<ret.days.count {
+                ret.days[i+1].yesterday = ret.days[i] //must reConfigue the yesterday for each day in days;
+            }
         }
         return ret;
     }

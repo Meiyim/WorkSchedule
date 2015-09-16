@@ -7,25 +7,43 @@
 //
 
 import UIKit
-
+protocol ScheduleManagemenVCDelegate: class {
+    func scheduleManagementVC(commitChange schedule: Schedule);
+    func scheduleManagementVC(deleteSchedule schedule: Schedule);
+    func scheduleManagementVC(scheduleApplied schedule: Schedule);
+}
 class ScheduleManagementVC: UITableViewController {
     // MARK: - properties
     var scheduleToEdit: Schedule!;
     var worksLib: WorksLib!;
+    var delegate: ScheduleManagemenVCDelegate?
     // MARK: - Outlets
     @IBOutlet weak var applyButton: UILabel!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneButton: UIBarButtonItem!
     //MARK: - Action
     @IBAction func done(sender: AnyObject) {
-        
-    }
-    @IBAction func cancel(sender: AnyObject) {
+        scheduleToEdit.title = textField.text;
+        delegate?.scheduleManagementVC(commitChange: scheduleToEdit);
         dismissViewControllerAnimated(true, completion: nil);
     }
+    @IBAction func cancel(sender: AnyObject) {
+        //delegate?.scheduleManagementVC(deleteSchedule: scheduleToEdit);
+        dismissViewControllerAnimated(true, completion: nil);
+    }
+    @IBAction func textFieldEndTyping(sender: AnyObject) {
+        textField.resignFirstResponder();
+    }
     //MARK: - Views;
+    override func viewWillAppear(animated: Bool) {
+        validateDoneButton();
+        println("view will apear");
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
+        println("view did load")
+        doneButton.enabled = false;
+        textField.text = scheduleToEdit.title;
         applyButton.textColor = applyButton.tintColor;
         textField.becomeFirstResponder();
         if scheduleToEdit.title == "" {
@@ -59,10 +77,10 @@ class ScheduleManagementVC: UITableViewController {
     }
     //MARK: - Utilities
     private func validateDoneButton(){
-        if(true){
+        if(scheduleToEdit.okToUse){
             doneButton.enabled = true;
         }else{
-            //doneButton.enabled = false;
+            doneButton.enabled = false;
         }
     }
 

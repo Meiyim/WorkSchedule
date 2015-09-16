@@ -13,7 +13,7 @@ class CycleManagementVC: UIViewController {
 
     
     // MARK: - Properties
-    var scheduleBackup: Schedule!;
+    var scheduleBackup: Schedule?;
     var scheduleToEdit :Schedule!;
     var worksLib: WorksLib!;
     var isRiseUp = true;
@@ -115,7 +115,11 @@ class CycleManagementVC: UIViewController {
     func cancel(sender: UIBarButtonItem){
         let alert = UIAlertController(title: "放弃所有更改？", message: "", preferredStyle: .ActionSheet) //i18n
         let action1 = UIAlertAction(title: "放弃", style: .Destructive, handler: { _ in
-            self.scheduleToEdit = self.scheduleBackup.mutableCopy() as! Schedule;
+            if let sched = self.scheduleBackup?.mutableCopy() as? Schedule {
+                self.scheduleToEdit = sched; //有可能没有做备份。如果一开始进入编辑的时候倒班表什么都没有的话
+            }else{
+                self.scheduleToEdit.clearAll()
+            }
             self.tableView.reloadData();
             self.setEditing(false, animated: true);
         })
@@ -213,13 +217,13 @@ class CycleManagementVC: UIViewController {
         }
 
         if editing {
-            navigationItem.hidesBackButton = true; //edit button pressed
+            navigationItem.setHidesBackButton(true, animated: true); //edit button pressed
             navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: Selector("cancel:"))
-            scheduleBackup = scheduleToEdit.mutableCopy() as! Schedule;
+            scheduleBackup = scheduleToEdit.mutableCopy() as? Schedule;
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
         }else{
-            navigationItem.hidesBackButton = false; // done button pressed
+            navigationItem.setHidesBackButton(false, animated: true); // done button pressed
             navigationItem.leftBarButtonItem = nil;
             if let idToDelete = temperalDaySection{ //如果切换回到非editing的时候，tabel中有temperal day。在这里将其删除。以下逻辑中reloadsection用了两段。将被删除的section隔开了。
                 tableView.beginUpdates();

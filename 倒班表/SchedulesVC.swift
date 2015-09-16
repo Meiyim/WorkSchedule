@@ -29,8 +29,6 @@ class SchedulesVC: UITableViewController {
     // MARK: - Table view data source
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
         return 2
     }
 
@@ -38,24 +36,31 @@ class SchedulesVC: UITableViewController {
         if section == 0{
             return 1;
         }else{
-            return 3;
+            return dataLib.scheduleLib.count;
         }
     }
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0{
-            return "Work";
+            return "工作库"; //i18n
         }else{
-            return "Schedule";
+            return "倒班表";
         }
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell", forIndexPath: indexPath) as! UITableViewCell
-        var titleLabel = cell.viewWithTag(100) as! UILabel;
+        var cell: UITableViewCell;
         if indexPath.row == 0 && indexPath.section == 0 {
-            titleLabel.text = "管理班种"
+            if let cell2 = tableView.dequeueReusableCellWithIdentifier("WorkManagementCell") as? UITableViewCell{
+                cell = cell2;
+            }else{
+                cell = UITableViewCell(style: .Default, reuseIdentifier: "WorkManagementCell")
+            }
+            cell.textLabel?.text = "管理工作库" //i18n
         }else{
-            titleLabel.text = "void"
+            cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell") as! UITableViewCell
+            let sched = dataLib.scheduleLib[indexPath.row]
+            cell.textLabel?.text = sched.title;
+            cell.detailTextLabel?.text = sched.displaySummery;
         }
         return cell
     }
@@ -64,48 +69,11 @@ class SchedulesVC: UITableViewController {
         if indexPath.row == 0 && indexPath.section == 0 {
             performSegueWithIdentifier("ShowWorkManagement", sender: tableView.cellForRowAtIndexPath(indexPath))
         }else{
-            performSegueWithIdentifier("ShowNewSchedule", sender: tableView.cellForRowAtIndexPath(indexPath))
+            performSegueWithIdentifier("ShowNewSchedule", sender: indexPath)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
     }
-    
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    
+   
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -113,21 +81,66 @@ class SchedulesVC: UITableViewController {
         if segue.identifier == "ShowWorkManagement" {
             let controller = segue.destinationViewController as! WorkManagementVC
             controller.works = self.dataLib.worksLib;
-            
         } else if segue.identifier == "ShowNewSchedule" {
             let navi = segue.destinationViewController as! UINavigationController;
             let controller = navi.topViewController as! ScheduleManagementVC
-            if let id = sender as? NSIndexPath{
+            if let id = sender as? NSIndexPath{ //editting a schedule
                 controller.worksLib = dataLib.worksLib;
                 controller.scheduleToEdit = dataLib.scheduleLib[id.row];
+                controller.delegate = self;
             }else{
-                controller.worksLib = dataLib.worksLib;
+                controller.worksLib = dataLib.worksLib; // create a new schedule
                 let schedule = Schedule();
                 controller.scheduleToEdit = schedule;
-                
+                controller.delegate = self;
             }
         }
     }
     
+
+}
+
+
+extension SchedulesVC: ScheduleManagemenVCDelegate {
+    func scheduleManagementVC(commitChange schedule: Schedule) {
+        doAfterDelay(0.3){
+            var idtodelete: NSIndexPath?;
+            if let id = find(self.dataLib.scheduleLib, schedule){
+                self.dataLib.scheduleLib.removeAtIndex(id);
+                idtodelete = NSIndexPath(forRow: id, inSection: 1)
+                //self.tableView.deleteRowsAtIndexPaths([idtodelete!], withRowAnimation: .Right)
+            }
+
+            var idtoinsert: NSIndexPath!
+            if self.dataLib.scheduleNowApplying == nil {
+                self.dataLib.scheduleLib.insert(schedule, atIndex: 0); // if no schedule is now applying;
+                idtoinsert = NSIndexPath(forRow: 0, inSection: 1)
+            }else{
+                self.dataLib.scheduleLib.insert(schedule, atIndex: 1);
+                idtoinsert = NSIndexPath(forRow: 1, inSection: 1);
+            }
+            self.tableView.beginUpdates()
+            if let id = idtodelete {
+                self.tableView.deleteRowsAtIndexPaths([id], withRowAnimation: .Right)
+            }
+            self.tableView.insertRowsAtIndexPaths([idtoinsert], withRowAnimation: .Right) // always insert at the head
+            self.tableView.endUpdates();
+        }
+    }
+    func scheduleManagementVC(deleteSchedule schedule: Schedule){
+        doAfterDelay(0.3){
+            if let id = find(self.dataLib.scheduleLib, schedule){
+                self.dataLib.scheduleLib.removeAtIndex(id);
+                let idtodelete = NSIndexPath(forRow: id, inSection: 1)
+                self.tableView.deleteRowsAtIndexPaths([idtodelete], withRowAnimation: .Fade);
+            }
+        }
+
+    }
+    func scheduleManagementVC(scheduleApplied schedule: Schedule){
+        dataLib.scheduleNowApplying = nil;
+        scheduleManagementVC(commitChange: schedule);
+        dataLib.scheduleNowApplying = schedule;
+    }
 
 }
