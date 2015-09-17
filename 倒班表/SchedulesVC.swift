@@ -56,6 +56,7 @@ class SchedulesVC: UITableViewController {
                 cell = UITableViewCell(style: .Default, reuseIdentifier: "WorkManagementCell")
             }
             cell.textLabel?.text = "管理工作库" //i18n
+            cell.accessoryType  = .DisclosureIndicator
         }else{
             cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell") as! UITableViewCell
             let sched = dataLib.scheduleLib[indexPath.row]

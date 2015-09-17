@@ -83,7 +83,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="750" y="-320"/>
+            <point key="canvasLocation" x="740" y="-1130"/>
         </scene>
         <!--Schedules-->
         <scene sceneID="2nd-F9-INS">
@@ -94,7 +94,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="checkmark" indentationWidth="10" reuseIdentifier="ScheduleCell" textLabel="44i-lS-quU" style="IBUITableViewCellStyleDefault" id="sjf-5T-dC0">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ScheduleCell" textLabel="44i-lS-quU" style="IBUITableViewCellStyleDefault" id="sjf-5T-dC0">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="sjf-5T-dC0" id="4Yc-kd-GIe">
                                     <autoresizingMask key="autoresizingMask"/>
@@ -599,12 +599,32 @@
                     </tabBar>
                     <connections>
                         <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
+                        <segue destination="1yC-Or-uio" kind="relationship" relationship="viewControllers" id="pxP-yF-sKB"/>
                         <segue destination="dpV-hc-S6o" kind="relationship" relationship="viewControllers" id="156-EQ-mmT"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="0.0" y="0.0"/>
+            <point key="canvasLocation" x="-328" y="-360"/>
+        </scene>
+        <!--Calender-->
+        <scene sceneID="8GT-L3-SCD">
+            <objects>
+                <viewController id="1yC-Or-uio" customClass="CalenderVC" customModule="倒班表" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Bys-67-6N0"/>
+                        <viewControllerLayoutGuide type="bottom" id="DLB-Rt-i96"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="iv9-fH-TiB">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Calender" id="QVU-UW-h6z"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wjm-B7-WaQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="740" y="-360"/>
         </scene>
         <!--倒班表-->
         <scene sceneID="5gj-Ol-M6W">
@@ -623,7 +643,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ebN-js-FfT" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="750" y="380"/>
+            <point key="canvasLocation" x="748" y="380"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="4ec-zQ-Ri2">

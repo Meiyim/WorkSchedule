@@ -11,12 +11,14 @@ import Foundation
 class DataLib: NSObject, NSCoding {
     var worksLib = [Part]();
     var scheduleLib = [Schedule]();
-    weak var scheduleNowApplying: Schedule?
+    var scheduleParsor = ScheduleParsor();
+    weak var scheduleNowApplying: Schedule? //pointer like
     override init(){}
     // save&load
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(worksLib, forKey: "worksLib")
         aCoder.encodeObject(scheduleLib, forKey: "scheduleLib")
+        aCoder.encodeObject(scheduleParsor, forKey: "scheduleParsor")
         if let _sched = scheduleNowApplying {
             let nowUsingIndex = find(scheduleLib, _sched )
             aCoder.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
@@ -25,8 +27,15 @@ class DataLib: NSObject, NSCoding {
         }
     }
     required init(coder aDecoder: NSCoder) {
-        worksLib = aDecoder.decodeObjectForKey("worksLib") as! [Part]
-        scheduleLib = aDecoder.decodeObjectForKey("scheduleLib") as! [Schedule]
+        if let lib = aDecoder.decodeObjectForKey("worksLib") as? [Part]{
+            worksLib = lib;
+        }
+        if let lib = aDecoder.decodeObjectForKey("scheduleLib") as? [Schedule] {
+            scheduleLib = lib
+        }
+        if let parsor = aDecoder.decodeObjectForKey("scheduleParsor") as? ScheduleParsor {
+            scheduleParsor = parsor;
+        }
         let id = aDecoder.decodeIntegerForKey("nowUsingIndex")
         if id == -1{
             scheduleNowApplying = nil;
