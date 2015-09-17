@@ -8,14 +8,16 @@
 
 import UIKit
 protocol ScheduleManagemenVCDelegate: class {
-    func scheduleManagementVC(commitChange schedule: Schedule);
+    func scheduleManagementVC(commitChange schedule: Schedule,completion closure: (()->())?) ;
     func scheduleManagementVC(deleteSchedule schedule: Schedule);
     func scheduleManagementVC(scheduleApplied schedule: Schedule);
+    func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule);
 }
 class ScheduleManagementVC: UITableViewController {
     // MARK: - properties
+    var scheduleBackUp: Schedule!
     var scheduleToEdit: Schedule!;
-    var worksLib: WorksLib!;
+    weak var dataLib: DataLib!;
     var delegate: ScheduleManagemenVCDelegate?
     // MARK: - Outlets
     @IBOutlet weak var applyButton: UILabel!
@@ -24,12 +26,20 @@ class ScheduleManagementVC: UITableViewController {
     //MARK: - Action
     @IBAction func done(sender: AnyObject) {
         scheduleToEdit.title = textField.text;
-        delegate?.scheduleManagementVC(commitChange: scheduleToEdit);
+        delegate?.scheduleManagementVC(commitChange: scheduleToEdit, completion: nil);
         dismissViewControllerAnimated(true, completion: nil);
     }
-    @IBAction func cancel(sender: AnyObject) {
-        //delegate?.scheduleManagementVC(deleteSchedule: scheduleToEdit);
-        dismissViewControllerAnimated(true, completion: nil);
+    @IBAction func cancel(sender: AnyObject){
+        let alert = UIAlertController(title: "放弃所有更改？", message: "", preferredStyle: .ActionSheet) //i18n
+        let action1 = UIAlertAction(title: "放弃", style: .Destructive, handler: { _ in
+            // read back up
+            self.delegate?.scheduleManagementVC(cancelSchedule: self.scheduleToEdit, retreatToSchedule: self.scheduleBackUp)
+            self.dismissViewControllerAnimated(true, completion: nil);
+        })
+        let action2 = UIAlertAction(title: "取消", style: .Cancel, handler: {_ in });
+        alert.addAction(action1)
+        alert.addAction(action2)
+        presentViewController(alert, animated: true, completion: nil);
     }
     @IBAction func textFieldEndTyping(sender: AnyObject) {
         textField.resignFirstResponder();
@@ -51,6 +61,7 @@ class ScheduleManagementVC: UITableViewController {
         }else{
             navigationItem.title = scheduleToEdit.title;
         }
+        scheduleBackUp = scheduleToEdit.mutableCopy() as! Schedule;
     }
 
     override func didReceiveMemoryWarning() {
@@ -61,7 +72,25 @@ class ScheduleManagementVC: UITableViewController {
     // MARK: - Table view data source
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
-        if(indexPath.section != 0 ){
+        let sec = indexPath.section
+        let row = indexPath.row
+        switch(sec,row){
+        case(3,0):
+            break;
+        case(3,1):
+            let alert = UIAlertController(title: "删除此倒班表？？", message: "", preferredStyle: .ActionSheet) //i18n
+            let action1 = UIAlertAction(title: "删除", style: .Destructive, handler: { _ in
+                self.delegate?.scheduleManagementVC(deleteSchedule: self.scheduleToEdit);
+                self.dismissViewControllerAnimated(true, completion: nil);
+            })
+            let action2 = UIAlertAction(title: "取消", style: .Cancel, handler: {_ in });
+            alert.addAction(action1)
+            alert.addAction(action2)
+            presentViewController(alert, animated: true, completion: nil);
+        default:
+            break;
+        }
+        if(sec != 0 ){
             textField.resignFirstResponder();
         }
     }    
@@ -71,7 +100,7 @@ class ScheduleManagementVC: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showEditCycle" {
             let controller = segue.destinationViewController as! CycleManagementVC;
-            controller.worksLib = self.worksLib
+            controller.dataLib = self.dataLib;
             controller.scheduleToEdit = self.scheduleToEdit;
         }
     }

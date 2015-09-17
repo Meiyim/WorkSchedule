@@ -10,7 +10,7 @@ import UIKit
 
 class SchedulesVC: UITableViewController {
     // MARK: - properties
-    var dataLib: DataLib!;
+    weak var dataLib: DataLib!;
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -73,23 +73,37 @@ class SchedulesVC: UITableViewController {
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
     }
-   
+    // MARK: - utilities
+    private func applySchedule(schedule: Schedule?){ // will set the cell at 1-0 to tint color
+        dataLib.scheduleNowApplying = schedule;
+        let id = NSIndexPath(forRow: 0, inSection: 1)
+        if schedule == nil {
+            if let cell = tableView.cellForRowAtIndexPath(id){
+                cell.textLabel?.textColor = UIColor.blackColor(); //set to normal
+                cell.accessoryType = .None;
+            }
+        }else{
+            let cell = tableView.cellForRowAtIndexPath(id)! //should always succeed
+            cell.textLabel?.textColor = cell.textLabel?.tintColor;
+            cell.accessoryType = .Checkmark
+        }
+    }
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "ShowWorkManagement" {
             let controller = segue.destinationViewController as! WorkManagementVC
-            controller.works = self.dataLib.worksLib;
+            controller.dataLib = self.dataLib;
         } else if segue.identifier == "ShowNewSchedule" {
             let navi = segue.destinationViewController as! UINavigationController;
             let controller = navi.topViewController as! ScheduleManagementVC
             if let id = sender as? NSIndexPath{ //editting a schedule
-                controller.worksLib = dataLib.worksLib;
+                controller.dataLib = dataLib;
                 controller.scheduleToEdit = dataLib.scheduleLib[id.row];
                 controller.delegate = self;
             }else{
-                controller.worksLib = dataLib.worksLib; // create a new schedule
+                controller.dataLib = dataLib; // create a new schedule
                 let schedule = Schedule();
                 controller.scheduleToEdit = schedule;
                 controller.delegate = self;
@@ -102,7 +116,7 @@ class SchedulesVC: UITableViewController {
 
 
 extension SchedulesVC: ScheduleManagemenVCDelegate {
-    func scheduleManagementVC(commitChange schedule: Schedule) {
+    func scheduleManagementVC(commitChange schedule: Schedule,completion closure: (()->())?) {
         doAfterDelay(0.3){
             var idtodelete: NSIndexPath?;
             if let id = find(self.dataLib.scheduleLib, schedule){
@@ -125,22 +139,31 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             }
             self.tableView.insertRowsAtIndexPaths([idtoinsert], withRowAnimation: .Right) // always insert at the head
             self.tableView.endUpdates();
+            closure?();
         }
     }
     func scheduleManagementVC(deleteSchedule schedule: Schedule){
+
         doAfterDelay(0.3){
             if let id = find(self.dataLib.scheduleLib, schedule){
                 self.dataLib.scheduleLib.removeAtIndex(id);
                 let idtodelete = NSIndexPath(forRow: id, inSection: 1)
                 self.tableView.deleteRowsAtIndexPaths([idtodelete], withRowAnimation: .Fade);
+                if schedule == self.dataLib.scheduleNowApplying {
+                    self.applySchedule(nil);
+                }
             }
         }
 
     }
     func scheduleManagementVC(scheduleApplied schedule: Schedule){
-        dataLib.scheduleNowApplying = nil;
-        scheduleManagementVC(commitChange: schedule);
-        dataLib.scheduleNowApplying = schedule;
+        applySchedule(nil);
+        scheduleManagementVC(commitChange: schedule, completion:{self.applySchedule(schedule)});
+    }
+    func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule){
+        if let id = find(dataLib.scheduleLib, schedule){
+            dataLib.scheduleLib[id] = ori;
+        }
     }
 
 }

@@ -12,11 +12,11 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var dataLib = DataLib();
+    var dataLib: DataLib!;
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         println(documentDirectory());
-        dataLib.load();
+        dataLib = load();
         let tabBarController = window!.rootViewController as! UITabBarController;
         if let tabBarVCs = tabBarController.viewControllers{
             let navigationCont = tabBarVCs[1] as! UINavigationController;
@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
-        dataLib.save();
+        save(dataLib)
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -44,9 +44,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(application: UIApplication) {
-        dataLib.save();
+        save(dataLib)
     }
-
+    // MARK: - load & save
+    func save(lib: DataLib){
+        let worksLibData = NSMutableData();
+        let archiver = NSKeyedArchiver(forWritingWithMutableData: worksLibData)
+        archiver.encodeObject(lib, forKey: "dataLib")
+        archiver.finishEncoding();
+        worksLibData.writeToFile(dataFilePath(), atomically: true);
+        println("SAVE SUCCESSFULLY")
+    }
+    
+    func load()->DataLib{
+        var ret: DataLib!
+        let path = dataFilePath();
+        if NSFileManager.defaultManager().fileExistsAtPath(path){
+            if let data = NSData(contentsOfFile: path){
+                let unarchiver = NSKeyedUnarchiver(forReadingWithData: data)
+                ret = unarchiver.decodeObjectForKey("dataLib") as! DataLib;
+                unarchiver.finishDecoding();
+                println("LOAD SUCCESSFULLY")
+            }
+        }else{
+            ret = DataLib();
+        }
+        return ret;
+    }
 
 }
 

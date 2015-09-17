@@ -7,47 +7,33 @@
 //
 
 import Foundation
-class WorksLib {
-    var lib = [Part]()
-}
 
-class DataLib {
-    var worksLib = WorksLib();
+class DataLib: NSObject, NSCoding {
+    var worksLib = [Part]();
     var scheduleLib = [Schedule]();
     weak var scheduleNowApplying: Schedule?
-    private var nowUsingIndex: Int?;
-    func save(){
-        let worksLibData = NSMutableData();
-        let archiver = NSKeyedArchiver(forWritingWithMutableData: worksLibData)
-        archiver.encodeObject(worksLib.lib, forKey: "WorksLib")
-        archiver.encodeObject(scheduleLib, forKey: "ScheduleLib");
-        worksLibData.writeToFile(dataFilePath(), atomically: true);
+    override init(){}
+    // save&load
+    func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeObject(worksLib, forKey: "worksLib")
+        aCoder.encodeObject(scheduleLib, forKey: "scheduleLib")
         if let _sched = scheduleNowApplying {
-            nowUsingIndex = find(scheduleLib, _sched )
-            archiver.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
+            let nowUsingIndex = find(scheduleLib, _sched )
+            aCoder.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
         }else{
-            archiver.encodeInteger(-1, forKey: "nowUsingIndex")
-        }
-        archiver.finishEncoding();
-    }
-    
-    func load(){
-        let path = dataFilePath();
-        if NSFileManager.defaultManager().fileExistsAtPath(path){
-            if let data = NSData(contentsOfFile: path){
-                let unarchiver = NSKeyedUnarchiver(forReadingWithData: data)
-                if let works = unarchiver.decodeObjectForKey("WorksLib") as? [Part]{
-                    worksLib.lib = works
-                }
-                if let data1 = unarchiver.decodeObjectForKey("ScheduleLib") as? [Schedule]{
-                    scheduleLib = data1
-                }
-                let integer = unarchiver.decodeIntegerForKey("nowUsingIndex")
-                if integer != -1 {
-                    nowUsingIndex = integer;
-                }
-                unarchiver.finishDecoding();
-            }
+            aCoder.encodeInteger(-1, forKey: "nowUsingIndex")
         }
     }
+    required init(coder aDecoder: NSCoder) {
+        worksLib = aDecoder.decodeObjectForKey("worksLib") as! [Part]
+        scheduleLib = aDecoder.decodeObjectForKey("scheduleLib") as! [Schedule]
+        let id = aDecoder.decodeIntegerForKey("nowUsingIndex")
+        if id == -1{
+            scheduleNowApplying = nil;
+        }else{
+            scheduleNowApplying = scheduleLib[id];
+        }
+        super.init();
+    }
+
 }

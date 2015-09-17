@@ -14,7 +14,7 @@ protocol RiseUpViewDelegate {
 
 
 class RiseUpView:UIView, UITableViewDelegate {
-    var worksLib = WorksLib(){
+    weak var dataLib: DataLib!{
         didSet{
             riseUpTableView.reloadData();
         }
@@ -30,7 +30,7 @@ class RiseUpView:UIView, UITableViewDelegate {
 
 extension RiseUpView: UITableViewDataSource {
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return worksLib.lib.count;
+        return dataLib.worksLib.count;
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1;
@@ -43,8 +43,8 @@ extension RiseUpView: UITableViewDataSource {
             cell = UITableViewCell(style: .Value1, reuseIdentifier: "worksCell");
         }
         let id = indexPath.row;
-        cell.textLabel?.text = worksLib.lib[id].title;
-        cell.detailTextLabel?.text = worksLib.lib[id].descriptionIn24h;
+        cell.textLabel?.text = dataLib.worksLib[id].title;
+        cell.detailTextLabel?.text = dataLib.worksLib[id].descriptionIn24h;
         return cell
     }
 }

@@ -10,7 +10,7 @@ import UIKit
 
 class WorkManagementVC: UITableViewController {
     //MARK: - properties
-    var works: WorksLib!;
+    weak var dataLib: DataLib!
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
         ret.timeStyle = .ShortStyle;
@@ -50,7 +50,7 @@ class WorkManagementVC: UITableViewController {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
-        return works.lib.count;
+        return dataLib.worksLib.count;
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -58,8 +58,8 @@ class WorkManagementVC: UITableViewController {
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("WorkCell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel!.text = works.lib[indexPath.row].title;
-        let work = works.lib[indexPath.row];
+        cell.textLabel!.text = dataLib.worksLib[indexPath.row].title;
+        let work = dataLib.worksLib[indexPath.row];
         cell.detailTextLabel!.text = String(format: "%@ ~ %@",
                                             work.begin.formattedString,work.end.formattedString )
         return cell
@@ -70,7 +70,7 @@ class WorkManagementVC: UITableViewController {
     
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            works.lib.removeAtIndex(indexPath.row);
+            dataLib.worksLib.removeAtIndex(indexPath.row);
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
     }
@@ -95,7 +95,7 @@ class WorkManagementVC: UITableViewController {
             let cont = dest.topViewController as! NewWorkVC;
             cont.delegate = self
             let id = sender as! NSIndexPath;
-            cont.workToEdit = works.lib[id.row];
+            cont.workToEdit = dataLib.worksLib[id.row];
         }
         super.prepareForSegue(segue, sender: sender)
     }
@@ -106,13 +106,13 @@ class WorkManagementVC: UITableViewController {
 
 extension WorkManagementVC: NewWorkVCDelegate{
     func appendNewWork(work: Part) {
-        works.lib.append(work)
+        dataLib.worksLib.append(work)
         tableView.reloadData();
         println("work inserted!")
     }
     func editWork(work: Part) {
-        if let id = find(works.lib, work){
-            works.lib[id] = work;
+        if let id = find(dataLib.worksLib, work){
+            dataLib.worksLib[id] = work;
             tableView.reloadData();
             println("work modified! \(work)");
         }else{

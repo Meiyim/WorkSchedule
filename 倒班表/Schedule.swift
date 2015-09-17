@@ -155,16 +155,16 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
     }
     //MARK: - NSCopying
     func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
-        if days.isEmpty  { return nil}
         var ret = Schedule();
+        println("copying the schedule")
         ret.title = self.title
         ret.isInEdittingMode = self.isInEdittingMode
         ret.days = arrayCopy(self.days);
-        if days.count == 1{
+        if days.count == 1 || days.count == 0{
             return ret;
         }else{
-            for i in 0..<ret.days.count {
-                ret.days[i+1].yesterday = ret.days[i] //must reConfigue the yesterday for each day in days;
+            for i in 1..<ret.days.count {
+                ret.days[i].yesterday = ret.days[i-1] //must reConfigue the yesterday for each day in days;
             }
         }
         return ret;

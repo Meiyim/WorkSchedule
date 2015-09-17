@@ -13,9 +13,8 @@ class CycleManagementVC: UIViewController {
 
     
     // MARK: - Properties
-    var scheduleBackup: Schedule?;
     var scheduleToEdit :Schedule!;
-    var worksLib: WorksLib!;
+    weak var dataLib: DataLib!;
     var isRiseUp = true;
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .NoStyle
@@ -112,24 +111,6 @@ class CycleManagementVC: UIViewController {
             tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 44, right: 0)
         }
     }
-    func cancel(sender: UIBarButtonItem){
-        let alert = UIAlertController(title: "放弃所有更改？", message: "", preferredStyle: .ActionSheet) //i18n
-        let action1 = UIAlertAction(title: "放弃", style: .Destructive, handler: { _ in
-            if let sched = self.scheduleBackup?.mutableCopy() as? Schedule {
-                self.scheduleToEdit = sched; //有可能没有做备份。如果一开始进入编辑的时候倒班表什么都没有的话
-            }else{
-                self.scheduleToEdit.clearAll()
-            }
-            self.tableView.reloadData();
-            self.setEditing(false, animated: true);
-        })
-        let action2 = UIAlertAction(title: "取消", style: .Cancel, handler: {_ in });
-        alert.addAction(action1)
-        alert.addAction(action2)
-        presentViewController(alert, animated: true, completion: nil);
-        
-        
-    }
     // MARK: - utilities
     private func shoudButtonBeHiddenForSeciont(section: Int) -> Bool{
         if editing {
@@ -218,13 +199,10 @@ class CycleManagementVC: UIViewController {
 
         if editing {
             navigationItem.setHidesBackButton(true, animated: true); //edit button pressed
-            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: Selector("cancel:"))
-            scheduleBackup = scheduleToEdit.mutableCopy() as? Schedule;
             let ids = self.scheduleToEdit.indexPathOfIntervals();
             self.tableView.deleteRowsAtIndexPaths(ids, withRowAnimation: .Top);
         }else{
             navigationItem.setHidesBackButton(false, animated: true); // done button pressed
-            navigationItem.leftBarButtonItem = nil;
             if let idToDelete = temperalDaySection{ //如果切换回到非editing的时候，tabel中有temperal day。在这里将其删除。以下逻辑中reloadsection用了两段。将被删除的section隔开了。
                 tableView.beginUpdates();
                 tableView.deleteSections(NSIndexSet(index: idToDelete), withRowAnimation: .Bottom);
@@ -245,7 +223,7 @@ class CycleManagementVC: UIViewController {
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 44, right: 0)
         let button2 = toolBar.items?[1] as! UIBarButtonItem;
         button2.width = (view.bounds.width - 88) //the width of the trash item is 44!
-        riseUpView.worksLib = worksLib;
+        riseUpView.dataLib = dataLib;
         riseUpView.delegate = self;
         scheduleToEdit.isInEdittingMode = false
         navigationItem.rightBarButtonItem = editButtonItem();
@@ -441,7 +419,7 @@ extension CycleManagementVC: UINavigationBarDelegate{ //deal with the status bar
 extension CycleManagementVC: RiseUpViewDelegate {
     func riseUpViewDidSelectId(indexPath: NSIndexPath) {
         let id = indexPath.row;
-        let workToAppend = worksLib.lib[id];
+        let workToAppend = dataLib.worksLib[id];
         if let idToInsert = scheduleToEdit.appendWork(workToAppend){
             //if idToInsert.row == -1 {
            //     let id = NSIndexPath(forRow: 0, inSection: idToInsert.section);

@@ -204,7 +204,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fbW-ve-36a" userLabel="riseUpView" customClass="RiseUpView" customModule="倒班表" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="556" width="600" height="220"/>
                                 <subviews>
-                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.79999999999999982" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzH-Sz-VQZ">
+                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.94999999999999996" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MzH-Sz-VQZ">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                                         <items>
                                             <barButtonItem enabled="NO" systemItem="trash" id="E88-lw-gLF">
@@ -414,7 +414,7 @@
                     <navigationItem key="navigationItem" id="LIK-MN-ALx">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="cuY-m5-R8E">
                             <connections>
-                                <action selector="cancel:" destination="0lg-pj-OS2" id="NpU-JZ-AYG"/>
+                                <action selector="cancel:" destination="0lg-pj-OS2" id="k8i-nc-tgq"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" enabled="NO" systemItem="save" id="r79-qp-An1">
