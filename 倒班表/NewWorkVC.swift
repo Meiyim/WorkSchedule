@@ -60,19 +60,19 @@ class NewWorkVC: UITableViewController {
     @IBOutlet weak var textField: UITextField!
     //MARK: - Actions
     @IBAction func done(sender: AnyObject) {
-        if var beg = beginDate{
-            if var end = endDate{
+        if let beg = beginDate{
+            if let end = endDate{
                 if let work = workToEdit{
-                    work.title = textField.text;
+                    work.title = textField.text!;
                     work.beginDate = beg;
                     work.endDate = end;
                     work.shouldRemind = shouldRemindSwitch.on;
                     delegate?.editWork(work);
                 }else{
-                    let work = Part(name: textField.text, beginDate: beg, endDate: end,shouldRemind: shouldRemindSwitch.on)
+                    let work = Part(name: textField.text!, beginDate: beg, endDate: end,shouldRemind: shouldRemindSwitch.on)
                     delegate?.appendNewWork(work)
                 }
-                println(beg);
+                print(beg);
             }
         }
         dismissViewControllerAnimated(true, completion: nil)
@@ -124,7 +124,7 @@ class NewWorkVC: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if timePickerIsVisible && indexPath.section == 1 && indexPath.row == timePickerRow {
             
-            var cell: UITableViewCell! = tableView.dequeueReusableCellWithIdentifier("TimePickerCell") as? UITableViewCell
+            var cell: UITableViewCell! = tableView.dequeueReusableCellWithIdentifier("TimePickerCell")
             if cell == nil {
                 cell = UITableViewCell(style: .Default, reuseIdentifier: "TimePickerCell")
                 cell.selectionStyle = .None
@@ -202,53 +202,9 @@ class NewWorkVC: UITableViewController {
         }
         return super.tableView(tableView, indentationLevelForRowAtIndexPath: indexPath)
     }
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
     // MARK: - utilities
     func validateDoneButton(){
-        if(textField.text.isEmpty) || beginDate == nil || endDate == nil {
+        if(textField.text!.isEmpty) || beginDate == nil || endDate == nil {
             doneButton.enabled = false;
         }else{
             doneButton.enabled = true;
@@ -303,7 +259,7 @@ class NewWorkVC: UITableViewController {
 
 extension NewWorkVC: UITextFieldDelegate{
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        let oldText: NSString = textField.text
+        let oldText: NSString = textField.text!
         let newText: NSString = oldText.stringByReplacingCharactersInRange(range, withString: string)
         if newText.length > 0 {
             validateDoneButton();

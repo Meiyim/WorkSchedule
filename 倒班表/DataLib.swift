@@ -20,13 +20,13 @@ class DataLib: NSObject, NSCoding {
         aCoder.encodeObject(scheduleLib, forKey: "scheduleLib")
         aCoder.encodeObject(scheduleParsor, forKey: "scheduleParsor")
         if let _sched = scheduleNowApplying {
-            let nowUsingIndex = find(scheduleLib, _sched )
+            let nowUsingIndex = scheduleLib.indexOf(_sched )
             aCoder.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
         }else{
             aCoder.encodeInteger(-1, forKey: "nowUsingIndex")
         }
     }
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         if let lib = aDecoder.decodeObjectForKey("worksLib") as? [Part]{
             worksLib = lib;
         }

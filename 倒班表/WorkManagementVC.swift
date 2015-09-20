@@ -33,7 +33,7 @@ class WorkManagementVC: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    required init (coder aDecoder: NSCoder){
+    required init? (coder aDecoder: NSCoder){
         super.init(coder: aDecoder)    
     }
     // MARK: - utilities
@@ -57,7 +57,7 @@ class WorkManagementVC: UITableViewController {
         performSegueWithIdentifier("ShowEditWork", sender: indexPath)
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("WorkCell", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("WorkCell", forIndexPath: indexPath) 
         cell.textLabel!.text = dataLib.worksLib[indexPath.row].title;
         let work = dataLib.worksLib[indexPath.row];
         cell.detailTextLabel!.text = String(format: "%@ ~ %@",
@@ -108,13 +108,13 @@ extension WorkManagementVC: NewWorkVCDelegate{
     func appendNewWork(work: Part) {
         dataLib.worksLib.append(work)
         tableView.reloadData();
-        println("work inserted!")
+        print("work inserted!")
     }
     func editWork(work: Part) {
-        if let id = find(dataLib.worksLib, work){
+        if let id = dataLib.worksLib.indexOf(work){
             dataLib.worksLib[id] = work;
             tableView.reloadData();
-            println("work modified! \(work)");
+            print("work modified! \(work)");
         }else{
             assert(false, "never should come here")
         }

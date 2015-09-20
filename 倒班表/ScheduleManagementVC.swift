@@ -19,13 +19,19 @@ class ScheduleManagementVC: UITableViewController {
     var scheduleToEdit: Schedule!;
     weak var dataLib: DataLib!;
     var delegate: ScheduleManagemenVCDelegate?
+    // MARK: - constant
+    var rowNumberOfPickerCell = 1;
+    var sectionNumberOfPickerCell = 3;
+    var timePickerIsVisible = false
     // MARK: - Outlets
     @IBOutlet weak var applyButton: UILabel!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneButton: UIBarButtonItem!
+    @IBOutlet weak var applyCell: UITableViewCell!
+    @IBOutlet weak var confirmCancelCell: UITableViewCell!
     //MARK: - Action
     @IBAction func done(sender: AnyObject) {
-        scheduleToEdit.title = textField.text;
+        scheduleToEdit.title = textField.text!;
         delegate?.scheduleManagementVC(commitChange: scheduleToEdit, completion: nil);
         dismissViewControllerAnimated(true, completion: nil);
     }
@@ -44,14 +50,17 @@ class ScheduleManagementVC: UITableViewController {
     @IBAction func textFieldEndTyping(sender: AnyObject) {
         textField.resignFirstResponder();
     }
+    func timeChanged(sender: UIDatePicker){
+        print(sender.date)
+    }
     //MARK: - Views;
     override func viewWillAppear(animated: Bool) {
         validateDoneButton();
-        println("view will apear");
+        print("view will apear");
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        println("view did load")
+        print("view did load")
         doneButton.enabled = false;
         textField.text = scheduleToEdit.title;
         applyButton.textColor = applyButton.tintColor;
@@ -68,15 +77,46 @@ class ScheduleManagementVC: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    // MARK: - Table view data source
+    // MARK: - TableView delegate
+    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+        if timePickerIsVisible && indexPath.section == sectionNumberOfPickerCell{
+            if indexPath.row != rowNumberOfPickerCell + 1{
+                return nil
+            }else{
+                return indexPath;
+            }
+        }else{
+            return indexPath
+        }
+    }
+    override func tableView(tableView: UITableView, var indentationLevelForRowAtIndexPath indexPath: NSIndexPath) -> Int {
+        if timePickerIsVisible {
+            if indexPath.section == sectionNumberOfPickerCell && indexPath.row == rowNumberOfPickerCell {
+                indexPath = NSIndexPath(forRow: 0, inSection: sectionNumberOfPickerCell);
+            }else if indexPath.section == sectionNumberOfPickerCell && indexPath.row > rowNumberOfPickerCell{
+                indexPath = NSIndexPath(forRow: 0, inSection: indexPath.section)
+            }
+        }
+        return super.tableView(tableView, indentationLevelForRowAtIndexPath: indexPath)
+    }
+    override func tableView(tableView: UITableView, var heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if timePickerIsVisible {
+            if indexPath.section == sectionNumberOfPickerCell && indexPath.row == rowNumberOfPickerCell{
+                return 217
+            }else if indexPath.section == sectionNumberOfPickerCell && indexPath.row > rowNumberOfPickerCell{
+                indexPath = NSIndexPath(forRow: indexPath.row - 1, inSection: indexPath.section);
+            }
+        }
+        return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
+        
+    }
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
         let sec = indexPath.section
         let row = indexPath.row
         switch(sec,row){
         case(3,0):
-            break;
+            showApplyConfirm();
         case(3,1):
             let alert = UIAlertController(title: "删除此倒班表？？", message: "", preferredStyle: .ActionSheet) //i18n
             let action1 = UIAlertAction(title: "删除", style: .Destructive, handler: { _ in
@@ -87,13 +127,45 @@ class ScheduleManagementVC: UITableViewController {
             alert.addAction(action1)
             alert.addAction(action2)
             presentViewController(alert, animated: true, completion: nil);
+        case(3,2): //hitting the confirm button
+            confirmApplication()
         default:
-            break;
+            hideApplyConfirm();
         }
         if(sec != 0 ){
             textField.resignFirstResponder();
         }
-    }    
+    }
+    // MARK: - Table view data source
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == sectionNumberOfPickerCell && timePickerIsVisible {
+            return 3
+        }else{
+            return super.tableView(tableView, numberOfRowsInSection: section)
+        }
+    }
+    override func tableView(tableView: UITableView, var cellForRowAtIndexPath  indexPath: NSIndexPath) -> UITableViewCell {
+        if timePickerIsVisible {
+            if indexPath.section == sectionNumberOfPickerCell && indexPath.row == rowNumberOfPickerCell{
+                var cell: UITableViewCell! = tableView.dequeueReusableCellWithIdentifier("TimePickerCell")
+                if cell == nil{
+                    cell = UITableViewCell(style: .Default, reuseIdentifier: "TimePickerCell")
+                    cell.selectionStyle = .None;
+                    let picker = UIDatePicker(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 216))
+                    picker.tag = 100;
+                    picker.addTarget(self, action: Selector("timeChanged:"), forControlEvents: .ValueChanged)
+                    picker.datePickerMode = .Date;
+                    picker.maximumDate = NSDate();
+                    cell.contentView.addSubview(picker);
+                    
+                }
+                return cell;
+            }else if indexPath.section == sectionNumberOfPickerCell && indexPath.row > rowNumberOfPickerCell {
+                indexPath = NSIndexPath(forRow: indexPath.row - 1, inSection: indexPath.section)
+            }
+        }
+        return super.tableView(tableView, cellForRowAtIndexPath: indexPath)
+    }
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -105,6 +177,34 @@ class ScheduleManagementVC: UITableViewController {
         }
     }
     //MARK: - Utilities
+    private func confirmApplication(){
+        
+    }
+    private func showApplyConfirm(){
+        let insertID = NSIndexPath(forRow: rowNumberOfPickerCell, inSection: sectionNumberOfPickerCell)
+        
+        timePickerIsVisible = true;
+        tableView.insertRowsAtIndexPaths([insertID], withRowAnimation: .Fade)
+        let label = applyCell.viewWithTag(101) as! UILabel
+        label.text = "新周期将起始于..." //i18n
+        
+        let label2 = confirmCancelCell.viewWithTag(102) as! UILabel
+        label2.text = "确认" // i18n
+        label2.textColor = label2.tintColor
+        
+    }
+    private func hideApplyConfirm(){
+        if !timePickerIsVisible {return}
+        timePickerIsVisible = false;
+        let deleteID = NSIndexPath(forRow: rowNumberOfPickerCell, inSection: sectionNumberOfPickerCell)
+        tableView.deleteRowsAtIndexPaths([deleteID], withRowAnimation: .Fade)
+        let label = applyCell.viewWithTag(101) as! UILabel
+        label.text = "应用倒班周期" //i18n
+        
+        let label2 = confirmCancelCell.viewWithTag(102) as! UILabel
+        label2.text = "删除" // i18n
+        label2.textColor = UIColor.redColor();
+    }
     private func validateDoneButton(){
         if(scheduleToEdit.okToUse){
             doneButton.enabled = true;
@@ -117,7 +217,7 @@ class ScheduleManagementVC: UITableViewController {
 
 extension ScheduleManagementVC: UITextFieldDelegate{
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        let oldText: NSString = textField.text
+        let oldText: NSString = textField.text!
         let newText: NSString = oldText.stringByReplacingCharactersInRange(range, withString: string)
         if newText.length > 0 {
             validateDoneButton();

@@ -49,10 +49,10 @@ class CycleManagementVC: UIViewController {
 
     }
     @IBAction func moveRiseUpView(sender: AnyObject){
-        println("did reveived gesture");
+        print("did reveived gesture");
         if let recognizer = sender as? UIGestureRecognizer{
             let position = recognizer.locationInView(view); //taping somewhere else
-            println(position);
+            print(position);
         }else{ // tapping the add button
             
         }
@@ -74,12 +74,12 @@ class CycleManagementVC: UIViewController {
     }
     func receiveDragging(rec: UIPanGestureRecognizer){
         if isRiseUp {return}
-        println("panning received")
+        print("panning received")
         if rec.state == .Began{
             moveRiseUpView(rec);
         }
     }
-    override func animationDidStop(anim: CAAnimation!, finished flag: Bool) {
+    override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
         if isRiseUp {
             riseUpView.layer.removeAllAnimations(); //set status when is up
             riseUpView.center.x = view.bounds.width / 2;
@@ -89,7 +89,7 @@ class CycleManagementVC: UIViewController {
             
             // enabling the GRs;
             let arr = tableView.gestureRecognizers;
-            println(arr!.count);
+            print(arr!.count);
             let rec2 = arr!.last! as! UIPanGestureRecognizer ; // the pan GR;
             let rec = arr![arr!.count - 2] as! UITapGestureRecognizer; // the tap GR;
             rec2.enabled = true;
@@ -159,7 +159,7 @@ class CycleManagementVC: UIViewController {
         assert(id >= 0, "something wrong triggered this selector");
         if let tempDays = scheduleToEdit.sectionOfTemperalDays() {
             if(id > tempDays){--id}
-            print("\(tempDays) --> \(id)\n")
+            print("\(tempDays) --> \(id)\n", terminator: "")
             scheduleToEdit.removeEmptyDay(tempDays)
             scheduleToEdit.addEmptyDay(id);
             tableView.beginUpdates()
@@ -189,7 +189,7 @@ class CycleManagementVC: UIViewController {
     }
     override func setEditing(editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
-        var temperalDaySection = scheduleToEdit.sectionOfTemperalDays();
+        let temperalDaySection = scheduleToEdit.sectionOfTemperalDays();
         tableView.setEditing(editing, animated: animated);
         trashButton.enabled = editing;
         scheduleToEdit.isInEdittingMode = editing; //data Source Chaged in Here
@@ -216,13 +216,13 @@ class CycleManagementVC: UIViewController {
 
         }
         //updateAddDayButton();
-        doAfterDelay(0.3, {self.tableView.reloadData()})
+        doAfterDelay(0.3, closure: {self.tableView.reloadData()})
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 44, right: 0)
-        let button2 = toolBar.items?[1] as! UIBarButtonItem;
-        button2.width = (view.bounds.width - 88) //the width of the trash item is 44!
+        let button2 = toolBar.items?[1];
+        button2!.width = (view.bounds.width - 88) //the width of the trash item is 44!
         riseUpView.dataLib = dataLib;
         riseUpView.delegate = self;
         scheduleToEdit.isInEdittingMode = false
@@ -279,7 +279,7 @@ extension CycleManagementVC :UITableViewDelegate{
 }
 extension CycleManagementVC :UITableViewDataSource{
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        println("asking the number of work in day\(section): \(scheduleToEdit.numberOfWorksInDay(section))");
+        print("asking the number of work in day\(section): \(scheduleToEdit.numberOfWorksInDay(section))");
         return scheduleToEdit.numberOfWorksInDay(section);
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -320,9 +320,9 @@ extension CycleManagementVC :UITableViewDataSource{
         return view
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        println("asking for indexPath\(indexPath.section),\(indexPath.row)");
+        print("asking for indexPath\(indexPath.section),\(indexPath.row)");
         var cell: UITableViewCell
-        if let cell2 = tableView.dequeueReusableCellWithIdentifier("worksArrangementCell") as? UITableViewCell {
+        if let cell2 = tableView.dequeueReusableCellWithIdentifier("worksArrangementCell") {
             cell = cell2;
         }else {
             cell =  UITableViewCell(style: .Value1, reuseIdentifier: "worksArrangementCell");
@@ -349,7 +349,7 @@ extension CycleManagementVC :UITableViewDataSource{
             if scheduleToEdit.removeWork(indexPath) {
                 let set = NSIndexSet(index: indexPath.section)
                 tableView.deleteSections(set, withRowAnimation: .Fade) // delete the whole damn section
-                doAfterDelay(0.3, {tableView.reloadData()}) // using this asynchronous method could be a little dangerous
+                doAfterDelay(0.3, closure: {tableView.reloadData()}) // using this asynchronous method could be a little dangerous
             }else{
                 tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade); //just delet the row
             }
@@ -361,10 +361,10 @@ extension CycleManagementVC :UITableViewDataSource{
         if sourceIndexPath == proposedDestinationIndexPath {return sourceIndexPath }
         let workToReorder = scheduleToEdit.workForIndexPath(sourceIndexPath);
         if let destination = scheduleToEdit.positionForWork(workToReorder, forIndex: proposedDestinationIndexPath) {
-            println("should redestinated to \(destination.section),\(destination.row)")
+            print("should redestinated to \(destination.section),\(destination.row)")
             return destination;
         }else{
-            println("should not move");
+            print("should not move");
             //canntFindProperPlaceForIndexPath(proposedDestinationIndexPath);
             //let ret = NSIndexPath(forRow: 0, inSection: proposedDestinationIndexPath.section)
             return sourceIndexPath;
@@ -380,7 +380,7 @@ extension CycleManagementVC :UITableViewDataSource{
             }else{
                 newToIndex = toIndexPath;
             }
-            println("moving cell \(fromIndexPath.section),\(fromIndexPath.row) -> \(newToIndex.section),\(newToIndex.row)")
+            print("moving cell \(fromIndexPath.section),\(fromIndexPath.row) -> \(newToIndex.section),\(newToIndex.row)")
 
             scheduleToEdit.addWork(workToReorder, inIndex: newToIndex); //newToIndex 是delete操作后应该insert的位置。toIndexPath是delete前应该insert的位置。
             
@@ -389,7 +389,7 @@ extension CycleManagementVC :UITableViewDataSource{
                 tableView.beginUpdates()
                 tableView.deleteSections(set, withRowAnimation: .Fade)
                 self.tableView.reloadSections(NSIndexSet(indexesInRange: NSRange(location: toIndexPath.section, length: 1)), withRowAnimation: .None) //此处应该用delete前的位置toIndexPath来更新section。因为在update块中的reload的index都应该是delete前的位置。
-                println("*******relaoded range: \(newToIndex.section):\(1)****deleteSection:\(set.firstIndex)")
+                print("*******relaoded range: \(newToIndex.section):\(1)****deleteSection:\(set.firstIndex)")
                 tableView.endUpdates();
             }
             
@@ -429,10 +429,10 @@ extension CycleManagementVC: RiseUpViewDelegate {
            // }
         }else{
             let set = NSIndexSet(index: scheduleToEdit.lastDays - 1)
-            println("will insert sections at \(scheduleToEdit.lastDays)");
+            print("will insert sections at \(scheduleToEdit.lastDays)");
             tableView.insertSections(set, withRowAnimation: .Fade)
         }
-        println("did insert schedule at last")
+        print("did insert schedule at last")
     }
 
     

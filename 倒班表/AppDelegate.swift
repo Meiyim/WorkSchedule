@@ -15,11 +15,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var dataLib: DataLib!;
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        println(documentDirectory());
+        print(documentDirectory());
         dataLib = load();
         let tabBarController = window!.rootViewController as! UITabBarController;
         if let tabBarVCs = tabBarController.viewControllers{
-            let navigationCont = tabBarVCs[1] as! UINavigationController;
+            let navigationCont = tabBarVCs[2] as! UINavigationController;
             let schedulesVC = navigationCont.viewControllers[0] as! SchedulesVC
             schedulesVC.dataLib = self.dataLib;
         }
@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         archiver.encodeObject(lib, forKey: "dataLib")
         archiver.finishEncoding();
         worksLibData.writeToFile(dataFilePath(), atomically: true);
-        println("SAVE SUCCESSFULLY")
+        print("SAVE SUCCESSFULLY")
     }
     
     func load()->DataLib{
@@ -64,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let unarchiver = NSKeyedUnarchiver(forReadingWithData: data)
                 ret = unarchiver.decodeObjectForKey("dataLib") as! DataLib;
                 unarchiver.finishDecoding();
-                println("LOAD SUCCESSFULLY")
+                print("LOAD SUCCESSFULLY")
             }
         }else{
             ret = DataLib();

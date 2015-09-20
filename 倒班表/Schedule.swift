@@ -20,15 +20,15 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
             }
         };
         //MARK: - save & loads
-        required init(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             parts = aDecoder.decodeObjectForKey("parts") as! [Part] //wont encode yesterday property when encoding
         }
         func encodeWithCoder(aCoder: NSCoder) {
             aCoder.encodeObject(parts, forKey: "parts");
         }
         //MARK: - copying
-        func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
-            var ret = Day();
+        func mutableCopyWithZone(zone: NSZone) -> AnyObject {
+            let ret = Day();
             ret.parts = arrayCopy(self.parts)
             ret.yesterday = nil;
             return ret;
@@ -131,7 +131,7 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
     override init(){
         //days.append(Day());
     }
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         isInEdittingMode = false;
         title = aDecoder.decodeObjectForKey("title") as! String;
         days = aDecoder.decodeObjectForKey("days") as! [Day];
@@ -154,9 +154,9 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         return lastDays != 0
     }
     //MARK: - NSCopying
-    func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
-        var ret = Schedule();
-        println("copying the schedule")
+    func mutableCopyWithZone(zone: NSZone) -> AnyObject {
+        let ret = Schedule();
+        print("copying the schedule")
         ret.title = self.title
         ret.isInEdittingMode = self.isInEdittingMode
         ret.days = arrayCopy(self.days);
@@ -241,7 +241,7 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         addEmptyDay(days.count);
         days.last?.addWork(work);
         days.last?.checkNumberOfIntervals();
-        println("inserted new days at the end");
+        print("inserted new days at the end");
         return nil;
     }
     //MARK: - edit method----this mothod must be used in editting mode!
@@ -272,7 +272,7 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         let day = inIndex.section;
         let workIndex = inIndex.row;
         days[day].removeWorkatIndex(workIndex);
-        println("work:\(workIndex) removed at day:\(day)");
+        print("work:\(workIndex) removed at day:\(day)");
         if days[day].parts.isEmpty || days[day].isTemperaDay {
             removeEmptyDay(day);
             return true;

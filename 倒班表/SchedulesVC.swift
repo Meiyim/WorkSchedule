@@ -50,7 +50,7 @@ class SchedulesVC: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell: UITableViewCell;
         if indexPath.row == 0 && indexPath.section == 0 {
-            if let cell2 = tableView.dequeueReusableCellWithIdentifier("WorkManagementCell") as? UITableViewCell{
+            if let cell2 = tableView.dequeueReusableCellWithIdentifier("WorkManagementCell"){
                 cell = cell2;
             }else{
                 cell = UITableViewCell(style: .Default, reuseIdentifier: "WorkManagementCell")
@@ -58,7 +58,7 @@ class SchedulesVC: UITableViewController {
             cell.textLabel?.text = "管理工作库" //i18n
             cell.accessoryType  = .DisclosureIndicator
         }else{
-            cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell") as! UITableViewCell
+            cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell")!
             let sched = dataLib.scheduleLib[indexPath.row]
             cell.textLabel?.text = sched.title;
             cell.detailTextLabel?.text = sched.displaySummery;
@@ -120,7 +120,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
     func scheduleManagementVC(commitChange schedule: Schedule,completion closure: (()->())?) {
         doAfterDelay(0.3){
             var idtodelete: NSIndexPath?;
-            if let id = find(self.dataLib.scheduleLib, schedule){
+            if let id = self.dataLib.scheduleLib.indexOf(schedule){
                 self.dataLib.scheduleLib.removeAtIndex(id);
                 idtodelete = NSIndexPath(forRow: id, inSection: 1)
                 //self.tableView.deleteRowsAtIndexPaths([idtodelete!], withRowAnimation: .Right)
@@ -146,7 +146,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
     func scheduleManagementVC(deleteSchedule schedule: Schedule){
 
         doAfterDelay(0.3){
-            if let id = find(self.dataLib.scheduleLib, schedule){
+            if let id = self.dataLib.scheduleLib.indexOf(schedule){
                 self.dataLib.scheduleLib.removeAtIndex(id);
                 let idtodelete = NSIndexPath(forRow: id, inSection: 1)
                 self.tableView.deleteRowsAtIndexPaths([idtodelete], withRowAnimation: .Fade);
@@ -162,7 +162,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
         scheduleManagementVC(commitChange: schedule, completion:{self.applySchedule(schedule)});
     }
     func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule){
-        if let id = find(dataLib.scheduleLib, schedule){
+        if let id = dataLib.scheduleLib.indexOf(schedule){
             dataLib.scheduleLib[id] = ori;
         }
     }

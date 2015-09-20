@@ -25,7 +25,7 @@ class Vacation: NSObject, NSCoding{
         toDate = to;
         self.style = style;
     }
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fromDate = aDecoder.decodeObjectForKey("fromDate") as! NSDate;
         toDate = aDecoder.decodeObjectForKey("toDate") as! NSDate;
         let id = aDecoder.decodeIntegerForKey("style")
@@ -68,13 +68,14 @@ class ScheduleParsor: NSObject, NSCoding{
     var schedule: Schedule?
     var applyDate: NSDate?
     var vacations = [Vacation]()
+    var calendar = NSCalendar(identifier: "gregorian")!
     //MARK: - initialization
     override init(){
         schedule = nil;
         applyDate = nil;
     }
     //MARK: - save & load
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         
     }
     func encodeWithCoder(aCoder: NSCoder) {
@@ -130,5 +131,15 @@ class ScheduleParsor: NSObject, NSCoding{
         get{
             return 0.0;
         }
+    }
+    //MARK: - utilities
+    private func midNightOfDate(date: NSDate) -> NSDate{
+        let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
+        return calendar.dateFromComponents(comp)!;
+    }
+    private func date(date: NSDate, afterdays days: Int) -> NSDate{
+        let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
+        comp.day += days;
+        return calendar.dateFromComponents(comp)!;
     }
 }

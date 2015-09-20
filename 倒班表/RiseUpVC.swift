@@ -37,7 +37,7 @@ extension RiseUpView: UITableViewDataSource {
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell: UITableViewCell;
-        if let cell2 = riseUpTableView.dequeueReusableCellWithIdentifier("worksCell") as? UITableViewCell {
+        if let cell2 = riseUpTableView.dequeueReusableCellWithIdentifier("worksCell") {
             cell = cell2;
         }else{
             cell = UITableViewCell(style: .Value1, reuseIdentifier: "worksCell");

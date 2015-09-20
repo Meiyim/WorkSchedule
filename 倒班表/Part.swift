@@ -16,7 +16,7 @@ class Part: NSObject, NSCoding, NSMutableCopying{
     var beginDate: NSDate = NSDate(){
         didSet{
             begin = (beginDate.timeIntervalSinceReferenceDate  ) % (3600*24.0) ;
-            println("did set2");
+            print("did set2");
         }
     };
     var endDate: NSDate = NSDate(){
@@ -49,7 +49,7 @@ class Part: NSObject, NSCoding, NSMutableCopying{
         super.init();
         begin = (beginDate.timeIntervalSinceReferenceDate) % (3600*24.0);
         end = (endDate.timeIntervalSinceReferenceDate) % (3600*24.0)
-        println("did set1");
+        print("did set1");
         if end < begin {
             end += 24 * 3600;
         }
@@ -70,7 +70,7 @@ class Part: NSObject, NSCoding, NSMutableCopying{
         aCoder.encodeDouble(begin, forKey: "begin"); // only save time intervals!
         aCoder.encodeDouble(end, forKey: "end");
     }
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         title = aDecoder.decodeObjectForKey("title") as! String
         isWork = aDecoder.decodeBoolForKey("isWork")
         shouldRemind = aDecoder.decodeBoolForKey("shouldRemind");
@@ -81,8 +81,8 @@ class Part: NSObject, NSCoding, NSMutableCopying{
         super.init();
     }
     //MAKR: - NSMutableCopying
-    func mutableCopyWithZone(zone: NSZone) -> AnyObject? {
-        var ret = Part()
+    func mutableCopyWithZone(zone: NSZone) -> AnyObject {
+        let ret = Part()
         ret.title = self.title;
         ret.isWork = self.isWork;
         ret.shouldRemind = self.shouldRemind;
@@ -100,7 +100,7 @@ class TemperalPart: Part{
         end = 88888888;
         begin = 88888888;
     }
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init();
         end = 88888888;
         begin = 88888888;
@@ -120,7 +120,7 @@ class BreakPart: Part{
             return lastValue;
         }
     }
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init();
         end = 88888888;
         begin = 88888888;
