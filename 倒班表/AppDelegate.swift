@@ -12,7 +12,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var dataLib: DataLib!;
+    var dataLib: DataLib!; //this is the only datalib in this application
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         print(documentDirectory());
@@ -22,6 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let navigationCont = tabBarVCs[2] as! UINavigationController;
             let schedulesVC = navigationCont.viewControllers[0] as! SchedulesVC
             schedulesVC.dataLib = self.dataLib;
+            let nowvc = tabBarVCs[0] as! NowVC
+            nowvc.dataLib = dataLib;
         }
         return true
     }

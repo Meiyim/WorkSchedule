@@ -12,14 +12,14 @@ class DataLib: NSObject, NSCoding {
     var worksLib = [Part]();
     var scheduleLib = [Schedule]();
     var scheduleParsor = ScheduleParsor();
-    weak var scheduleNowApplying: Schedule? //pointer like
+    //weak var scheduleNowApplying: Schedule? //pointer like
     override init(){}
     // save&load
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(worksLib, forKey: "worksLib")
         aCoder.encodeObject(scheduleLib, forKey: "scheduleLib")
         aCoder.encodeObject(scheduleParsor, forKey: "scheduleParsor")
-        if let _sched = scheduleNowApplying {
+        if let _sched = scheduleParsor.schedule {
             let nowUsingIndex = scheduleLib.indexOf(_sched )
             aCoder.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
         }else{
@@ -38,9 +38,9 @@ class DataLib: NSObject, NSCoding {
         }
         let id = aDecoder.decodeIntegerForKey("nowUsingIndex")
         if id == -1{
-            scheduleNowApplying = nil;
+            scheduleParsor.schedule = nil;
         }else{
-            scheduleNowApplying = scheduleLib[id];
+            scheduleParsor.schedule = scheduleLib[id];
         }
         super.init();
     }

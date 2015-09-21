@@ -10,11 +10,22 @@ import UIKit
 
 class NowVC: UIViewController {
     //MARK: - properties
+    weak var dataLib: DataLib!
+    weak var scheduleNowApplying: Schedule?
+    lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
+        ret.dateStyle = .ShortStyle
+        ret.timeStyle = .MediumStyle;
+        return ret;}()
     //MAKR: - Outlets
     @IBOutlet weak var cycleViewWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var cycleViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var nowDateLabel: UILabel!
+    @IBOutlet weak var scheduleNameLabel: UILabel!
     
     //MARK: - Actions
+    func timerFired(timer: NSTimer){
+        nowDateLabel.text = formatter.stringFromDate(NSDate());
+    }
     //MARK: - view
     
     override func viewDidLoad() {
@@ -22,6 +33,9 @@ class NowVC: UIViewController {
         let cycleWidth = view.bounds.size.width * 0.8
         cycleViewWidthConstraint.constant = cycleWidth
         cycleViewHeightConstraint.constant = cycleWidth
+        NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
+        scheduleNowApplying = dataLib.scheduleParsor.schedule
+        print("timeer scheduled");
         
         // Do any additional setup after loading the view.
     }
@@ -31,7 +45,10 @@ class NowVC: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
+    //MARK: - utilities
+    private func updateLabel(){
+        scheduleNameLabel.text = scheduleNowApplying?.title
+    }
     /*
     // MARK: - Navigation
 

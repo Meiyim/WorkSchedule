@@ -54,7 +54,6 @@ class ScheduleManagementVC: UITableViewController {
         print(sender.date)
     }
     func didTouched(sender: UITapGestureRecognizer){
-        print("touvhed")
         let posi = sender.locationInView(tableView)
         let id = tableView.indexPathForRowAtPoint(posi)
         if id?.section != sectionNumberOfPickerCell && id?.section != 0 {

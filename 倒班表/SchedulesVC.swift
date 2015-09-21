@@ -85,9 +85,10 @@ class SchedulesVC: UITableViewController {
     }
     // MARK: - utilities
     private func applySchedule(schedule: Schedule?, toDate: NSDate?){ // will set the cell at 1-0 to tint color
-        dataLib.scheduleNowApplying = schedule;
         if let sched = schedule{
             dataLib.scheduleParsor.apply(sched, date: toDate!)
+        }else{
+            dataLib.scheduleParsor.clear();
         }
     }
     // MARK: - Navigation
@@ -128,7 +129,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             }
 
             var idtoinsert: NSIndexPath!
-            if self.dataLib.scheduleNowApplying == nil {
+            if !self.dataLib.scheduleParsor.isApplying {
                 self.dataLib.scheduleLib.insert(schedule, atIndex: 0); // if no schedule is now applying;
                 idtoinsert = NSIndexPath(forRow: 0, inSection: 1)
             }else{
@@ -154,16 +155,16 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
                 self.dataLib.scheduleLib.removeAtIndex(id);
                 let idtodelete = NSIndexPath(forRow: id, inSection: 1)
                 self.tableView.deleteRowsAtIndexPaths([idtodelete], withRowAnimation: .Fade);
-                if schedule == self.dataLib.scheduleNowApplying {
-                    self.applySchedule(nil,toDate: nil);
+                if schedule == self.dataLib.scheduleParsor.schedule {
+                    self.dataLib.scheduleParsor.clear();
                 }
             }
         }
 
     }
     func scheduleManagementVC(scheduleApplied schedule: Schedule, toDate: NSDate){
-        applySchedule(nil, toDate: nil);
-        scheduleManagementVC(commitChange: schedule, completion:{self.applySchedule(schedule, toDate: toDate)});
+        dataLib.scheduleParsor.clear();
+        scheduleManagementVC(commitChange: schedule, completion:{self.dataLib.scheduleParsor.apply(schedule, date: toDate)});
     }
     func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule){
         if let id = dataLib.scheduleLib.indexOf(schedule){

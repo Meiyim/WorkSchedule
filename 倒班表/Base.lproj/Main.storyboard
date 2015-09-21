@@ -107,6 +107,8 @@
                     <connections>
                         <outlet property="cycleViewHeightConstraint" destination="fDz-gr-5zn" id="5tH-48-abm"/>
                         <outlet property="cycleViewWidthConstraint" destination="Mlj-z6-em4" id="yst-BD-eD2"/>
+                        <outlet property="nowDateLabel" destination="yWH-my-ZMQ" id="FOy-qP-EgG"/>
+                        <outlet property="scheduleNameLabel" destination="jZb-l4-d4m" id="Bkc-Dz-TPn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
