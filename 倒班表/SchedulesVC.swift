@@ -57,11 +57,20 @@ class SchedulesVC: UITableViewController {
             }
             cell.textLabel?.text = "管理工作库" //i18n
             cell.accessoryType  = .DisclosureIndicator
-        }else{
+        }else if indexPath.section == 1{
             cell = tableView.dequeueReusableCellWithIdentifier("ScheduleCell")!
             let sched = dataLib.scheduleLib[indexPath.row]
             cell.textLabel?.text = sched.title;
             cell.detailTextLabel?.text = sched.displaySummery;
+            cell.accessoryType = .None
+            cell.textLabel?.textColor = UIColor.blackColor();
+            if indexPath.row == 0 && dataLib.scheduleParsor.isApplying {
+                cell.accessoryType = .Checkmark
+                cell.textLabel?.textColor = cell.textLabel?.tintColor;
+            }
+        }else{
+            cell = UITableViewCell();
+            assert(false,"nevershouldcomehere")
         }
         return cell
     }
@@ -75,18 +84,10 @@ class SchedulesVC: UITableViewController {
         tableView.deselectRowAtIndexPath(indexPath, animated: true);
     }
     // MARK: - utilities
-    private func applySchedule(schedule: Schedule?){ // will set the cell at 1-0 to tint color
+    private func applySchedule(schedule: Schedule?, toDate: NSDate?){ // will set the cell at 1-0 to tint color
         dataLib.scheduleNowApplying = schedule;
-        let id = NSIndexPath(forRow: 0, inSection: 1)
-        if schedule == nil {
-            if let cell = tableView.cellForRowAtIndexPath(id){
-                cell.textLabel?.textColor = UIColor.blackColor(); //set to normal
-                cell.accessoryType = .None;
-            }
-        }else{
-            let cell = tableView.cellForRowAtIndexPath(id)! //should always succeed
-            cell.textLabel?.textColor = cell.textLabel?.tintColor;
-            cell.accessoryType = .Checkmark
+        if let sched = schedule{
+            dataLib.scheduleParsor.apply(sched, date: toDate!)
         }
     }
     // MARK: - Navigation
@@ -132,7 +133,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
                 idtoinsert = NSIndexPath(forRow: 0, inSection: 1)
             }else{
                 self.dataLib.scheduleLib.insert(schedule, atIndex: 1);
-                idtoinsert = NSIndexPath(forRow: 1, inSection: 1);
+                idtoinsert = NSIndexPath(forRow: 1, inSection: 1)
             }
             self.tableView.beginUpdates()
             if let id = idtodelete {
@@ -141,6 +142,9 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             self.tableView.insertRowsAtIndexPaths([idtoinsert], withRowAnimation: .Right) // always insert at the head
             self.tableView.endUpdates();
             closure?();
+        }
+        doAfterDelay(0.6){
+            self.tableView.reloadSections(NSIndexSet(index: 1), withRowAnimation: .None);
         }
     }
     func scheduleManagementVC(deleteSchedule schedule: Schedule){
@@ -151,15 +155,15 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
                 let idtodelete = NSIndexPath(forRow: id, inSection: 1)
                 self.tableView.deleteRowsAtIndexPaths([idtodelete], withRowAnimation: .Fade);
                 if schedule == self.dataLib.scheduleNowApplying {
-                    self.applySchedule(nil);
+                    self.applySchedule(nil,toDate: nil);
                 }
             }
         }
 
     }
-    func scheduleManagementVC(scheduleApplied schedule: Schedule){
-        applySchedule(nil);
-        scheduleManagementVC(commitChange: schedule, completion:{self.applySchedule(schedule)});
+    func scheduleManagementVC(scheduleApplied schedule: Schedule, toDate: NSDate){
+        applySchedule(nil, toDate: nil);
+        scheduleManagementVC(commitChange: schedule, completion:{self.applySchedule(schedule, toDate: toDate)});
     }
     func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule){
         if let id = dataLib.scheduleLib.indexOf(schedule){

@@ -133,6 +133,11 @@ class ScheduleParsor: NSObject, NSCoding{
         }
     }
     //MARK: - utilities
+    func aYearAgoOf(date: NSDate) -> NSDate {
+        let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
+        comp.year-- ;
+        return calendar.dateFromComponents(comp)!;
+    }
     private func midNightOfDate(date: NSDate) -> NSDate{
         let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
         return calendar.dateFromComponents(comp)!;

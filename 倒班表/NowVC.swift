@@ -9,10 +9,20 @@
 import UIKit
 
 class NowVC: UIViewController {
-
+    //MARK: - properties
+    //MAKR: - Outlets
+    @IBOutlet weak var cycleViewWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var cycleViewHeightConstraint: NSLayoutConstraint!
+    
+    //MARK: - Actions
+    //MARK: - view
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        let cycleWidth = view.bounds.size.width * 0.8
+        cycleViewWidthConstraint.constant = cycleWidth
+        cycleViewHeightConstraint.constant = cycleWidth
+        
         // Do any additional setup after loading the view.
     }
 

@@ -10,7 +10,7 @@ import UIKit
 protocol ScheduleManagemenVCDelegate: class {
     func scheduleManagementVC(commitChange schedule: Schedule,completion closure: (()->())?) ;
     func scheduleManagementVC(deleteSchedule schedule: Schedule);
-    func scheduleManagementVC(scheduleApplied schedule: Schedule);
+    func scheduleManagementVC(scheduleApplied schedule: Schedule, toDate: NSDate);
     func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule);
 }
 class ScheduleManagementVC: UITableViewController {
@@ -53,6 +53,15 @@ class ScheduleManagementVC: UITableViewController {
     func timeChanged(sender: UIDatePicker){
         print(sender.date)
     }
+    func didTouched(sender: UITapGestureRecognizer){
+        print("touvhed")
+        let posi = sender.locationInView(tableView)
+        let id = tableView.indexPathForRowAtPoint(posi)
+        if id?.section != sectionNumberOfPickerCell && id?.section != 0 {
+            textField.resignFirstResponder();
+            hideApplyConfirm()
+        }
+    }
     //MARK: - Views;
     override func viewWillAppear(animated: Bool) {
         validateDoneButton();
@@ -71,6 +80,10 @@ class ScheduleManagementVC: UITableViewController {
             navigationItem.title = scheduleToEdit.title;
         }
         scheduleBackUp = scheduleToEdit.mutableCopy() as! Schedule;
+        let gest = UITapGestureRecognizer();
+        gest.cancelsTouchesInView = false;
+        gest.addTarget(self, action: "didTouched:")
+        view.addGestureRecognizer(gest);
     }
 
     override func didReceiveMemoryWarning() {
@@ -156,6 +169,7 @@ class ScheduleManagementVC: UITableViewController {
                     picker.addTarget(self, action: Selector("timeChanged:"), forControlEvents: .ValueChanged)
                     picker.datePickerMode = .Date;
                     picker.maximumDate = NSDate();
+                    picker.minimumDate = dataLib.scheduleParsor.aYearAgoOf(NSDate());
                     cell.contentView.addSubview(picker);
                     
                 }
@@ -178,9 +192,13 @@ class ScheduleManagementVC: UITableViewController {
     }
     //MARK: - Utilities
     private func confirmApplication(){
-        
+        let picker = tableView.viewWithTag(100) as! UIDatePicker
+        delegate?.scheduleManagementVC(scheduleApplied: scheduleToEdit, toDate: picker.date);
+        //此处可以有动画
+        dismissViewControllerAnimated(true, completion: nil)
     }
     private func showApplyConfirm(){
+        if timePickerIsVisible {return}
         let insertID = NSIndexPath(forRow: rowNumberOfPickerCell, inSection: sectionNumberOfPickerCell)
         
         timePickerIsVisible = true;
