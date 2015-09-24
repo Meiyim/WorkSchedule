@@ -11,7 +11,7 @@ import UIKit
 class NowVC: UIViewController {
     //MARK: - properties
     weak var dataLib: DataLib!
-    weak var scheduleNowApplying: Schedule?
+    weak var scheduleParsor: ScheduleParsor!;
     lazy var formatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .ShortStyle
         ret.timeStyle = .MediumStyle;
@@ -22,9 +22,14 @@ class NowVC: UIViewController {
     @IBOutlet weak var nowDateLabel: UILabel!
     @IBOutlet weak var scheduleNameLabel: UILabel!
     
+    @IBOutlet weak var timeRemainLabel: UILabel!
+    @IBOutlet weak var percentageLabel: UILabel!
+    @IBOutlet weak var worksNoLabel: UILabel!
+    @IBOutlet weak var worksListLabel: UILabel!
     //MARK: - Actions
-    func timerFired(timer: NSTimer){
+    func timerFired(timer: NSTimer){ //a run loop updating the UI
         nowDateLabel.text = formatter.stringFromDate(NSDate());
+       // updateLabel();
     }
     //MARK: - view
     
@@ -33,8 +38,8 @@ class NowVC: UIViewController {
         let cycleWidth = view.bounds.size.width * 0.8
         cycleViewWidthConstraint.constant = cycleWidth
         cycleViewHeightConstraint.constant = cycleWidth
-        NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
-        scheduleNowApplying = dataLib.scheduleParsor.schedule
+        //NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
+        scheduleParsor = dataLib.scheduleParsor;
         print("timeer scheduled");
         
         // Do any additional setup after loading the view.
@@ -47,7 +52,20 @@ class NowVC: UIViewController {
     
     //MARK: - utilities
     private func updateLabel(){
-        scheduleNameLabel.text = scheduleNowApplying?.title
+        scheduleNameLabel.text = scheduleParsor.schedule?.title
+        if scheduleParsor.isApplying {/*
+            let work = scheduleParsor.workForDate(NSDate());
+            if work is BreakPart {
+                timeRemainLabel.text = "Breaking"
+            }else{
+                timeRemainLabel.text = work?.title;
+            }*/
+        }else{
+            timeRemainLabel.text = "No Schedule is Applying"
+            percentageLabel.text = "N/A"
+            worksNoLabel.text = "0 of 0"
+            worksListLabel.text = "(no list)"
+        }
     }
     /*
     // MARK: - Navigation

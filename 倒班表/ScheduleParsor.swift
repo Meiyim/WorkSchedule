@@ -111,8 +111,16 @@ class ScheduleParsor: NSObject, NSCoding{
         }
     }
     //MARK: - query
-    func worksForDate(date: NSDate) -> [Part] {
+    func worksIn24HForDate(date: NSDate) -> [Part] {
         return [Part]();
+    }
+    func workForDate(date: NSDate) -> Part?{
+        if !isApplying {return nil}
+        let day = deferenceBetween(applyDate!, secondDate: date) % (schedule!.lastDays)
+        let interval = date.timeIntervalSinceDate(midNightOfDate(date));
+        let id = schedule!.partNOForTime(interval, inDay: day);
+        let indexPath = NSIndexPath(forRow: id, inSection: day);
+        return schedule!.workForIndexPath(indexPath);
     }
     var now: NSDate{
         get{
@@ -150,12 +158,15 @@ class ScheduleParsor: NSObject, NSCoding{
         return calendar.dateFromComponents(comp)!;
     }
     private func midNightOfDate(date: NSDate) -> NSDate{
-        let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
-        return calendar.dateFromComponents(comp)!;
+        return calendar.startOfDayForDate(date);
     }
     private func date(date: NSDate, afterdays days: Int) -> NSDate{
         let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
         comp.day += days;
         return calendar.dateFromComponents(comp)!;
+    }
+    private func deferenceBetween(firstDate: NSDate, secondDate: NSDate) -> Int {
+        let sec = secondDate.timeIntervalSinceDate(firstDate)
+        return Int(sec)/(3600 * 24)
     }
 }

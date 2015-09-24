@@ -40,10 +40,10 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
                 parts.append(TemperalPart());
             }
         }
-        //MARK: - utilities
+        //MARK: - prpperties
         var intervals = [NSTimeInterval]();
         var isTemperaDay = false
-
+        
         func isWorkConflict(thiswork: Part) -> Bool{
             for work in parts{
                 if work.isConflictWithWork(thiswork) {
@@ -55,6 +55,21 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
             }
             return false;
         }
+        //MARK: - query method
+        func positionBeforeIndexForWork(work: Part) -> Int?{
+            if isWorkConflict(work){
+                return nil;
+            }else{
+                for (var i: Int = 0 ;i != parts.count; ++i) {
+                    if parts[i].begin > work.end {
+                        return i;
+                    }
+                }
+                return parts.count
+            }
+        }
+        //MARK: - edit method
+        
         func addWork(work: Part)->Int{ //the return value of this method indicate the row of the new inserted work;
             if isTemperaDay {
                 assert(parts.count == 1,"shouldnt involk this on a empty day")
@@ -71,23 +86,13 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
                     return 0;
                 }
             }
-    }
+        }
         func removeWorkatIndex(id: Int){
         parts.removeAtIndex(id);
-    }
-        func positionBeforeIndexForWork(work: Part) -> Int?{
-        if isWorkConflict(work){
-            return nil;
-        }else{
-            for (var i: Int = 0 ;i != parts.count; ++i) {
-                if parts[i].begin > work.end {
-                    return i;
-                }
-            }
-            return parts.count
         }
-    }
-        private func checkNumberOfIntervals(){
+
+    //MARK: - utilities
+        private func checkNumberOfIntervals(){ //update intervals
             assert( !parts.isEmpty, "cannot envoke this method on a empty day")
             let threshHold = 10 * 60.0; // threshHold used to distingush different part; now it is 10 min;
             intervals.removeAll(keepCapacity: true);
@@ -170,7 +175,26 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         return ret;
     }
     //MARK: - querry method
-    func sectionOfTemperalDays() -> Int? {
+    func partNOForTime(time: NSTimeInterval, inDay day: Int) -> Int{
+        assert(day < lastDays,"should query a day in cycle")
+        let thisDay = days[day]
+        let thisInterval = days[day].intervals
+        var lastTime = 0.0;
+        for i in 0..<thisInterval.count {
+            if thisInterval[i] < 0.1 {
+                let work = thisDay.parts[Int(-thisInterval[i])]
+                lastTime = work.end;
+            }else{
+                lastTime += thisInterval[i];
+            }
+            if lastTime > time {
+                return i;
+            }
+        }
+        assert(false,"never should come here");
+        return -1;
+    }
+    func sectionOfTemperalDays() -> Int? { //return the index of temepral day
         for (var i = 0; i != days.count; ++i){
             if days[i].isTemperaDay {return i}
         }

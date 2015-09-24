@@ -71,6 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }else{
             ret = DataLib();
         }
+        //ret.scheduleParsor.schedule?.isInEdittingMode = false; // to trigger the interval calculation
         return ret;
     }
 

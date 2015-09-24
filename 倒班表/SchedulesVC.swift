@@ -13,7 +13,9 @@ class SchedulesVC: UITableViewController {
     weak var dataLib: DataLib!;
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        for shed in dataLib.scheduleLib {
+            print("schedule list \(shed.title)")
+        }
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -129,8 +131,8 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             }
 
             var idtoinsert: NSIndexPath!
-            if !self.dataLib.scheduleParsor.isApplying {
-                self.dataLib.scheduleLib.insert(schedule, atIndex: 0); // if no schedule is now applying;
+            if (!self.dataLib.scheduleParsor.isApplying) || (self.dataLib.scheduleParsor.schedule === schedule){
+                self.dataLib.scheduleLib.insert(schedule, atIndex: 0); // if no schedule is now applying or when editing the applying schedule
                 idtoinsert = NSIndexPath(forRow: 0, inSection: 1)
             }else{
                 self.dataLib.scheduleLib.insert(schedule, atIndex: 1);
@@ -142,6 +144,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             }
             self.tableView.insertRowsAtIndexPaths([idtoinsert], withRowAnimation: .Right) // always insert at the head
             self.tableView.endUpdates();
+            print("ScheduleVC: move\(idtodelete!.row) to \(idtoinsert.row)")
             closure?();
         }
         doAfterDelay(0.6){
@@ -165,6 +168,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
     func scheduleManagementVC(scheduleApplied schedule: Schedule, toDate: NSDate){
         dataLib.scheduleParsor.clear();
         scheduleManagementVC(commitChange: schedule, completion:{self.dataLib.scheduleParsor.apply(schedule, date: toDate)});
+        print("schedule:\(schedule.title) applied")
     }
     func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule){
         if let id = dataLib.scheduleLib.indexOf(schedule){

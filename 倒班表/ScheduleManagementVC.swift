@@ -83,6 +83,7 @@ class ScheduleManagementVC: UITableViewController {
         gest.cancelsTouchesInView = false;
         gest.addTarget(self, action: "didTouched:")
         view.addGestureRecognizer(gest);
+        print("*** is now applying: \(dataLib.scheduleParsor.isApplying)")
     }
 
     override func didReceiveMemoryWarning() {

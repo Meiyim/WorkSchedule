@@ -39,8 +39,11 @@ class DataLib: NSObject, NSCoding {
         let id = aDecoder.decodeIntegerForKey("nowUsingIndex")
         if id == -1{
             scheduleParsor.schedule = nil;
+            print("load:*** no schedule is using ")
+
         }else{
             scheduleParsor.schedule = scheduleLib[id];
+            print("load:*** schedule:\(id) is using")
         }
         super.init();
     }
