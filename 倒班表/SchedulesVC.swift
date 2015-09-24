@@ -131,12 +131,18 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             }
 
             var idtoinsert: NSIndexPath!
-            if (!self.dataLib.scheduleParsor.isApplying) || (self.dataLib.scheduleParsor.schedule === schedule){
-                self.dataLib.scheduleLib.insert(schedule, atIndex: 0); // if no schedule is now applying or when editing the applying schedule
+            if (!self.dataLib.scheduleParsor.isApplying){
+                self.dataLib.scheduleLib.insert(schedule, atIndex: 0); // if no schedule is now applying
                 idtoinsert = NSIndexPath(forRow: 0, inSection: 1)
             }else{
-                self.dataLib.scheduleLib.insert(schedule, atIndex: 1);
-                idtoinsert = NSIndexPath(forRow: 1, inSection: 1)
+                if (idtodelete?.row == 0){ // if saving the applying schedule will reset now applying to nil
+                    self.dataLib.scheduleParsor.clear();
+                    self.dataLib.scheduleLib.insert(schedule, atIndex: 0);
+                    idtoinsert = NSIndexPath(forRow: 0, inSection: 1)
+                }else{
+                    self.dataLib.scheduleLib.insert(schedule, atIndex: 1);
+                    idtoinsert = NSIndexPath(forRow: 1, inSection: 1)
+                }
             }
             self.tableView.beginUpdates()
             if let id = idtodelete {
@@ -144,7 +150,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
             }
             self.tableView.insertRowsAtIndexPaths([idtoinsert], withRowAnimation: .Right) // always insert at the head
             self.tableView.endUpdates();
-            print("ScheduleVC: move\(idtodelete!.row) to \(idtoinsert.row)")
+            print("ScheduleVC: move\(idtodelete?.row) to \(idtoinsert.row)")
             closure?();
         }
         doAfterDelay(0.6){

@@ -29,7 +29,7 @@ class NowVC: UIViewController {
     //MARK: - Actions
     func timerFired(timer: NSTimer){ //a run loop updating the UI
         nowDateLabel.text = formatter.stringFromDate(NSDate());
-       // updateLabel();
+        updateLabel();
     }
     //MARK: - view
     
@@ -38,7 +38,7 @@ class NowVC: UIViewController {
         let cycleWidth = view.bounds.size.width * 0.8
         cycleViewWidthConstraint.constant = cycleWidth
         cycleViewHeightConstraint.constant = cycleWidth
-        //NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
         scheduleParsor = dataLib.scheduleParsor;
         print("timeer scheduled");
         
@@ -53,13 +53,13 @@ class NowVC: UIViewController {
     //MARK: - utilities
     private func updateLabel(){
         scheduleNameLabel.text = scheduleParsor.schedule?.title
-        if scheduleParsor.isApplying {/*
+        if scheduleParsor.isApplying {
             let work = scheduleParsor.workForDate(NSDate());
             if work is BreakPart {
                 timeRemainLabel.text = "Breaking"
             }else{
                 timeRemainLabel.text = work?.title;
-            }*/
+            }
         }else{
             timeRemainLabel.text = "No Schedule is Applying"
             percentageLabel.text = "N/A"

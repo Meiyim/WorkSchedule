@@ -224,6 +224,7 @@ class ScheduleManagementVC: UITableViewController {
         label2.textColor = UIColor.redColor();
     }
     private func validateDoneButton(){
+        scheduleToEdit.title = textField.text!
         if(scheduleToEdit.okToUse){
             doneButton.enabled = true;
         }else{

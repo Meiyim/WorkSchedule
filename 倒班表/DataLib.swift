@@ -19,12 +19,6 @@ class DataLib: NSObject, NSCoding {
         aCoder.encodeObject(worksLib, forKey: "worksLib")
         aCoder.encodeObject(scheduleLib, forKey: "scheduleLib")
         aCoder.encodeObject(scheduleParsor, forKey: "scheduleParsor")
-        if let _sched = scheduleParsor.schedule {
-            let nowUsingIndex = scheduleLib.indexOf(_sched )
-            aCoder.encodeInteger(nowUsingIndex!, forKey: "nowUsingIndex")
-        }else{
-            aCoder.encodeInteger(-1, forKey: "nowUsingIndex")
-        }
     }
     required init?(coder aDecoder: NSCoder) {
         if let lib = aDecoder.decodeObjectForKey("worksLib") as? [Part]{
@@ -35,15 +29,6 @@ class DataLib: NSObject, NSCoding {
         }
         if let parsor = aDecoder.decodeObjectForKey("scheduleParsor") as? ScheduleParsor {
             scheduleParsor = parsor;
-        }
-        let id = aDecoder.decodeIntegerForKey("nowUsingIndex")
-        if id == -1{
-            scheduleParsor.schedule = nil;
-            print("load:*** no schedule is using ")
-
-        }else{
-            scheduleParsor.schedule = scheduleLib[id];
-            print("load:*** schedule:\(id) is using")
         }
         super.init();
     }

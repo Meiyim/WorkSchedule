@@ -156,7 +156,7 @@ class Schedule: NSObject, NSCoding, NSMutableCopying {
         }
     }
     var okToUse: Bool {
-        return lastDays != 0
+        return (lastDays != 0) && (!title.isEmpty)
     }
     //MARK: - NSCopying
     func mutableCopyWithZone(zone: NSZone) -> AnyObject {

@@ -65,7 +65,7 @@ class Vacation: NSObject, NSCoding{
 }
 class ScheduleParsor: NSObject, NSCoding{
     //MARK: - properties
-    weak var schedule: Schedule?
+    var schedule: Schedule?
     var applyDate: NSDate?
     var vacations = [Vacation]()
     var calendar = NSCalendar(identifier: "gregorian")!
@@ -82,15 +82,18 @@ class ScheduleParsor: NSObject, NSCoding{
             vacations = [Vacation]();
         }
         applyDate = aDecoder.decodeObjectForKey("applyDate") as? NSDate;
+        schedule = aDecoder.decodeObjectForKey("schedule") as? Schedule;
     }
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(vacations, forKey: "vacations")
         aCoder.encodeObject(applyDate, forKey: "applyDate")
+        aCoder.encodeObject(schedule, forKey: "schedule");
     }
     //MARK: - settings
-    func apply(sched: Schedule, date: NSDate){
-        schedule = sched;
+    func apply(sched: Schedule, date: NSDate){ //argument could be nil
+        schedule = sched.mutableCopy() as? Schedule;
         applyDate = date;
+        schedule?.isInEdittingMode = false
     }
     func clear(){
         schedule = nil;
