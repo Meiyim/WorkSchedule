@@ -113,7 +113,7 @@ class BreakPart: Part{
         end = 88888888;
         begin = 88888888;
         lastValue = last;
-        
+        isWork = false
     }
     override var last: NSTimeInterval{
         get{

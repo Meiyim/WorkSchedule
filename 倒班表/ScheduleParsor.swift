@@ -17,6 +17,7 @@ class Vacation: NSObject, NSCoding{
     var fromDate: NSDate!;
     var toDate: NSDate!;
     var style: VacationStyle;
+
     override init(){
         fromDate = nil; toDate = nil; style = .Canceled;
     }
@@ -117,22 +118,64 @@ class ScheduleParsor: NSObject, NSCoding{
     func worksIn24HForDate(date: NSDate) -> [Part] {
         return [Part]();
     }
-    func workForDate(date: NSDate) -> Part?{
+    func dayNoForDate(date: NSDate) -> Int?{
         if !isApplying {return nil}
-        let day = deferenceBetween(applyDate!, secondDate: date) % (schedule!.lastDays)
-        let interval = date.timeIntervalSinceDate(midNightOfDate(date));
-        let id = schedule!.partNOForTime(interval, inDay: day);
-        let indexPath = NSIndexPath(forRow: id, inSection: day);
-        return schedule!.workForIndexPath(indexPath);
+        return deferenceBetween(applyDate!, secondDate: date) % (schedule!.lastDays)
     }
-    var now: NSDate{
-        get{
-            return NSDate();
+    func partNoForDate(date: NSDate) -> Int?{
+        if !isApplying {return nil}
+        let day = dayNoForDate(date)!
+        let interval = date.timeIntervalSinceDate(midNightOfDate(date));
+        return schedule!.partNOForTime(interval, inDay: day);
+    }
+    func indexPathForDate(date: NSDate) -> NSIndexPath?{
+        if !isApplying {return nil}
+        return NSIndexPath(forRow: partNoForDate(date)!, inSection: dayNoForDate(date)!);
+    }
+    func workForDate(date: NSDate) -> Part?{
+        if let indexPath = indexPathForDate(date){
+            return schedule!.workForIndexPath(indexPath);
+        }else{ return nil }
+    }
+    func nextWorkForDate(date: NSDate) -> Part?{ //
+        if var id = partNoForDate(date){
+            var day = dayNoForDate(date)!
+            if ++id == schedule!.numberOfWorksInDay(day++){
+                id = 0;
+                if day == schedule!.lastDays{day = 0}
+            }
+            let indexPath = NSIndexPath(forRow: id, inSection: day);
+            return schedule!.workForIndexPath(indexPath);
+        }else{
+            return nil;
         }
     }
-    var isWorkingNow: Bool{
+    var nextKeyTime: NSDate?{ // if now break return next work begin time , if now work return next work end time
+        if !isApplying {return nil}
+        if isWorkingNow {
+            let work = workForDate(NSDate())
+            let comp = NSDateComponents()
+            comp.second = Int(work!.end)
+            return calendar.dateFromComponents(comp)
+        }else{
+            let work = nextWorkForDate(NSDate())
+            return timeIntervalToDate(work!.begin)
+        }
+    }
+    var timeToNextKeyTime: NSDate? {
+        if !isApplying {return nil}
+        let interval = nextKeyTime!.timeIntervalSinceDate(NSDate())
+        return timeIntervalToDate(interval);
+        
+        
+    }
+    var isWorkingNow: Bool{ //shoudl ensure applying before involk should be top level interface
         get{
-            return true;
+            if let part = workForDate(NSDate()){
+                return part.isWork
+            }else{
+                return false; // not applying
+            }
         }
     }
     var isApplying: Bool{
@@ -155,6 +198,11 @@ class ScheduleParsor: NSObject, NSCoding{
         }
     }
     //MARK: - utilities
+    private func timeIntervalToDate(time: NSTimeInterval) -> NSDate{
+        let comp = NSDateComponents()
+        comp.second = Int(time)
+        return calendar.dateFromComponents(comp)!
+    }
     func aYearAgoOf(date: NSDate) -> NSDate {
         let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
         comp.year-- ;
