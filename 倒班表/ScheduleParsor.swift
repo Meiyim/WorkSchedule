@@ -70,6 +70,7 @@ class ScheduleParsor: NSObject, NSCoding{
     var applyDate: NSDate?
     var vacations = [Vacation]()
     var calendar = NSCalendar(identifier: "gregorian")!
+    var dayList = [Int]();
     //MARK: - initialization
     override init(){
         schedule = nil;
@@ -95,6 +96,11 @@ class ScheduleParsor: NSObject, NSCoding{
         schedule = sched.mutableCopy() as? Schedule;
         applyDate = date;
         schedule?.isInEdittingMode = false
+        var dayNo = 0;
+        for _ in 0..<365 {
+            dayList.append(dayNo);
+            if(++dayNo == schedule?.lastDays){dayNo = 0}
+        }
     }
     func clear(){
         schedule = nil;
@@ -109,46 +115,67 @@ class ScheduleParsor: NSObject, NSCoding{
         case .Canceled:
             break;
         case .Swap(let tuple):
-            let swapFromDate = tuple.0;
-            let swapToDate = tuple.1;
+            //let swapFromDate = tuple.0;
+            //let swapToDate = tuple.1;
             break;
         }
     }
     //MARK: - query
-    func worksIn24HForDate(date: NSDate) -> [Part] {
-        return [Part]();
-    }
     func dayNoForDate(date: NSDate) -> Int?{
         if !isApplying {return nil}
-        return deferenceBetween(applyDate!, secondDate: date) % (schedule!.lastDays)
+        return deferenceBetween(applyDate!, secondDate: date); //day id for scheduleParsor, not schedule!
     }
     func partNoForDate(date: NSDate) -> Int?{
         if !isApplying {return nil}
         let day = dayNoForDate(date)!
         let interval = date.timeIntervalSinceDate(midNightOfDate(date));
-        return schedule!.partNOForTime(interval, inDay: day);
+        return schedule!.partNOForTime(interval, inDay: dayList[day]);
     }
-    func indexPathForDate(date: NSDate) -> NSIndexPath?{
+    func indexPathForDate(date: NSDate) -> NSIndexPath?{ //indexPath for scheduleParsor, not schedule; considere vacation
         if !isApplying {return nil}
         return NSIndexPath(forRow: partNoForDate(date)!, inSection: dayNoForDate(date)!);
     }
+    func indexPathAfterIndexPath(indexPath: NSIndexPath) -> NSIndexPath{// should involked when applied
+        let sec = indexPath.section
+        if indexPath.row == schedule!.numberOfWorksInDay(sec) - 1{
+            return NSIndexPath(forRow: 0, inSection: indexPath.section + 1)
+        }else{
+            return NSIndexPath(forRow: indexPath.row + 1, inSection: indexPath.section);
+        }
+    }
+    func workForIndexPath(id: NSIndexPath) -> Part?{
+        return schedule?.workForIndexPath(NSIndexPath(forRow: id.row, inSection: dayList[id.section]));
+    }
     func workForDate(date: NSDate) -> Part?{
         if let indexPath = indexPathForDate(date){
-            return schedule!.workForIndexPath(indexPath);
+            return workForIndexPath(indexPath)
         }else{ return nil }
     }
+
     func nextWorkForDate(date: NSDate) -> Part?{ //
-        if var id = partNoForDate(date){
-            var day = dayNoForDate(date)!
-            if ++id == schedule!.numberOfWorksInDay(day++){
-                id = 0;
-                if day == schedule!.lastDays{day = 0}
-            }
-            let indexPath = NSIndexPath(forRow: id, inSection: day);
-            return schedule!.workForIndexPath(indexPath);
-        }else{
-            return nil;
+        if !isApplying {return nil}
+        let id = indexPathForDate(date)
+        var next = indexPathAfterIndexPath(id!)
+        var part =  workForIndexPath(next)!;
+        while (!part.isWork) {
+            next = indexPathAfterIndexPath(next)
+            part = workForIndexPath(next)!
         }
+        return part;
+    }
+    func intervalsWithin24HFrom(date: NSDate) -> [NSTimeInterval]?{
+        if !isApplying {return nil;}
+        var id = indexPathForDate(date)!
+        var part = workForIndexPath(id)!;
+        var sum = part.last
+        var ret = [NSTimeInterval]();
+        while (sum < 25 * 3600){
+            id = indexPathAfterIndexPath(id)
+            part = workForIndexPath(id)!
+            sum += part.last
+            ret.append(part.last)
+        }
+        return ret;
     }
     var nextKeyTime: NSDate?{ // if now break return next work begin time , if now work return next work end time
         if !isApplying {return nil}
