@@ -83,8 +83,12 @@ class ScheduleParsor: NSObject, NSCoding{
         }else{
             vacations = [Vacation]();
         }
-        applyDate = aDecoder.decodeObjectForKey("applyDate") as? NSDate;
-        schedule = aDecoder.decodeObjectForKey("schedule") as? Schedule;
+        super.init();
+        if let date = aDecoder.decodeObjectForKey("applyDate") as? NSDate{
+            if let sched = aDecoder.decodeObjectForKey("schedule") as? Schedule{
+                apply(sched, date: date);
+            }
+        }
     }
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(vacations, forKey: "vacations")
@@ -121,6 +125,10 @@ class ScheduleParsor: NSObject, NSCoding{
         }
     }
     //MARK: - query
+    func dateForDayNo(day: Int) -> NSDate?{
+        if !isApplying {return nil}
+        return date(applyDate!, afterdays: day);
+    }
     func dayNoForDate(date: NSDate) -> Int?{
         if !isApplying {return nil}
         return deferenceBetween(applyDate!, secondDate: date); //day id for scheduleParsor, not schedule!
@@ -136,15 +144,17 @@ class ScheduleParsor: NSObject, NSCoding{
         return NSIndexPath(forRow: partNoForDate(date)!, inSection: dayNoForDate(date)!);
     }
     func indexPathAfterIndexPath(indexPath: NSIndexPath) -> NSIndexPath{// should involked when applied
-        let sec = indexPath.section
-        if indexPath.row == schedule!.numberOfWorksInDay(sec) - 1{
+        if indexPath.row == numberOfWorksForIndexPath(indexPath)! - 1{
             return NSIndexPath(forRow: 0, inSection: indexPath.section + 1)
         }else{
             return NSIndexPath(forRow: indexPath.row + 1, inSection: indexPath.section);
         }
     }
+    func numberOfWorksForIndexPath(id: NSIndexPath) -> Int?{  // obtain data from schedule
+        return schedule?.numberOfWorksInDay(dayList[ id.section])
+    }
     func workForIndexPath(id: NSIndexPath) -> Part?{
-        return schedule?.workForIndexPath(NSIndexPath(forRow: id.row, inSection: dayList[id.section]));
+        return schedule?.workForIndexPath(NSIndexPath(forRow: id.row, inSection: dayList[id.section])); // obtain data from schedule
     }
     func workForDate(date: NSDate) -> Part?{
         if let indexPath = indexPathForDate(date){
@@ -191,12 +201,12 @@ class ScheduleParsor: NSObject, NSCoding{
     }
     var timeToNextKeyTime: NSDate? {
         if !isApplying {return nil}
-        let interval = nextKeyTime!.timeIntervalSinceDate(NSDate())
+        let interval = ( nextKeyTime!.timeIntervalSinceDate(NSDate()) ) % ( 3600 * 24)
         return timeIntervalToDate(interval);
         
         
     }
-    var isWorkingNow: Bool{ //shoudl ensure applying before involk should be top level interface
+    var isWorkingNow: Bool{ //should ensure applying before involk should be top level interface
         get{
             if let part = workForDate(NSDate()){
                 return part.isWork
@@ -221,7 +231,14 @@ class ScheduleParsor: NSObject, NSCoding{
     }
     var progressInCycle: Double{
         get{
-            return 0.0;
+            var i = 0;
+            for(i = dayNoForDate(NSDate())!; i != 0 ; --i){
+                if dayList[i] == 0 {
+                    break;
+                }
+            }
+            let dif = NSDate().timeIntervalSinceDate( dateForDayNo(i)! );
+            return dif / Double(schedule!.lastDays * 3600 * 24)
         }
     }
     //MARK: - utilities
