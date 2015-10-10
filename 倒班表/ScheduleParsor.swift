@@ -98,7 +98,7 @@ class ScheduleParsor: NSObject, NSCoding{
     //MARK: - settings
     func apply(sched: Schedule, date: NSDate){ //argument could be nil
         schedule = sched.mutableCopy() as? Schedule;
-        applyDate = date;
+        applyDate = calendar.startOfDayForDate(date)
         schedule?.isInEdittingMode = false
         var dayNo = 0;
         for _ in 0..<365 {
@@ -173,12 +173,13 @@ class ScheduleParsor: NSObject, NSCoding{
         }
         return part;
     }
-    func intervalsWithin24HFrom(date: NSDate) -> [NSTimeInterval]?{
+    func intervalsWithin25HFrom(date: NSDate) -> [NSTimeInterval]?{
         if !isApplying {return nil;}
         var id = indexPathForDate(date)!
         var part = workForIndexPath(id)!;
         var sum = part.last
         var ret = [NSTimeInterval]();
+        ret.append(part.last)
         while (sum < 25 * 3600){
             id = indexPathAfterIndexPath(id)
             part = workForIndexPath(id)!
@@ -187,21 +188,22 @@ class ScheduleParsor: NSObject, NSCoding{
         }
         return ret;
     }
-    var nextKeyTime: NSDate?{ // if now break return next work begin time , if now work return next work end time
+    var nextKeyTime: NSDate?{ // if now break return next work begin time , if now work return work end time
         if !isApplying {return nil}
+        let now = NSDate();
+        let day = dayNoForDate(now)!;
         if isWorkingNow {
-            let work = workForDate(NSDate())
-            let comp = NSDateComponents()
-            comp.second = Int(work!.end)
-            return calendar.dateFromComponents(comp)
+            let work = workForDate(now)!
+            return timeIntervalToDate(work.end + 3600 * 24 * Double(day))
         }else{
-            let work = nextWorkForDate(NSDate())
-            return timeIntervalToDate(work!.begin)
+            let work = nextWorkForDate(now)!
+            return timeIntervalToDate(work.begin + 3600 * 24 * Double(day))
         }
     }
     var timeToNextKeyTime: NSDate? {
         if !isApplying {return nil}
-        let interval = ( nextKeyTime!.timeIntervalSinceDate(NSDate()) ) % ( 3600 * 24)
+        var interval = nextKeyTime!.timeIntervalSinceDate(NSDate())
+        if interval < 0 { interval += 3600 * 24;}
         return timeIntervalToDate(interval);
         
         
@@ -243,9 +245,7 @@ class ScheduleParsor: NSObject, NSCoding{
     }
     //MARK: - utilities
     private func timeIntervalToDate(time: NSTimeInterval) -> NSDate{
-        let comp = NSDateComponents()
-        comp.second = Int(time)
-        return calendar.dateFromComponents(comp)!
+        return applyDate!.dateByAddingTimeInterval(time);
     }
     func aYearAgoOf(date: NSDate) -> NSDate {
         let comp = calendar.components([.Year, .Month, .Day], fromDate: date)

@@ -75,11 +75,11 @@ class NowVC: UIViewController {
             worksNoLabel.text = String(scheduleParsor.partNoForDate(now)!)
             dayNoLabel.text = String(format: "%d", scheduleParsor.dayNoForDate(now)!);
             var str = ""
-            for interval in scheduleParsor.intervalsWithin24HFrom(now)! {
+            for interval in scheduleParsor.intervalsWithin25HFrom(now)! {
                 str += "\(interval.formattedString),\n";
             }
             worksListLabel.text = str;
-            percentageLabel.text = String(format:"%@%4.1f" ,"%",scheduleParsor.progressInCycle * 100 );
+            percentageLabel.text = String(format:"%4.1f%@" ,"%",scheduleParsor.progressInCycle * 100 );
         }else{
             timeRemainLabel.text = "No Schedule is Applying"
             percentageLabel.text = "N/A"
