@@ -9,6 +9,12 @@
 import Foundation
 import UIKit
 import Dispatch
+
+
+var PAI: CGFloat = 3.1415926
+func degree2Rad(deg: CGFloat) -> CGFloat{
+    return deg * PAI / 180
+}
 func documentDirectory() -> String {
     let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true) 
     return paths[0]

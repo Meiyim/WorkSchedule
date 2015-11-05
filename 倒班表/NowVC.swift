@@ -12,6 +12,7 @@ class NowVC: UIViewController {
     //MARK: - properties
     weak var dataLib: DataLib!
     weak var scheduleParsor: ScheduleParsor!;
+    weak var spinnerView: CycleSpinnerView!;
     lazy var dateFormatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .ShortStyle
         ret.timeStyle = .MediumStyle;
@@ -47,7 +48,20 @@ class NowVC: UIViewController {
         NSTimer.scheduledTimerWithTimeInterval(5, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
         scheduleParsor = dataLib.scheduleParsor;
         updateLabel();
+        let rect = CGRect(x: (view.bounds.width - cycleWidth) / 2, y: (view.bounds.height - cycleWidth) / 2,
+            width: cycleWidth, height: cycleWidth)
+        let vi = CycleSpinnerView(frame: rect)
+        vi.delegate = self;
+        vi.opaque = false;
+        spinnerView = vi;
+        view.addSubview(vi);
+        //vi.backgroundColor = UIColor(red: 1, green: 0, blue: 0, alpha: 0.5);
         print("timeer scheduled");
+        doAfterDelay(1.0, closure: { self.spinnerView.start() })
+        //spinnerView.addPartWithLengthOf(9000, color: UIColor.redColor());
+        //spinnerView.addPartWithLengthOf(18000, color: UIColor.yellowColor());
+
+
         
         // Do any additional setup after loading the view.
     }
@@ -98,4 +112,23 @@ class NowVC: UIViewController {
     }
     */
 
+}
+
+extension NowVC: CycleSpinnerViewDelegate{
+    func askNewPartWithLengthOf() -> (NSTimeInterval, UIColor) {
+        let interval = scheduleParsor.nextWorkForDate(NSDate())!.last;
+        var color: UIColor!
+        switch(Int(interval) % 3){
+        case 0:
+            color = UIColor.yellowColor();
+        case 1:
+            color = UIColor.redColor();
+        case 2:
+            color = UIColor.greenColor();
+        default:
+            assert(false)
+        }
+        return (interval,color)
+        
+    }
 }

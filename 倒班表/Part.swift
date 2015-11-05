@@ -16,7 +16,6 @@ class Part: NSObject, NSCoding, NSMutableCopying{
     var beginDate: NSDate = NSDate(){
         didSet{
             begin = (beginDate.timeIntervalSinceReferenceDate  ) % (3600*24.0) ;
-            print("did set2");
         }
     };
     var endDate: NSDate = NSDate(){
