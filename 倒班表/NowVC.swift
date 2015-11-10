@@ -37,6 +37,7 @@ class NowVC: UIViewController {
     func timerFired(timer: NSTimer){ //a run loop updating the UI
         nowDateLabel.text = dateFormatter.stringFromDate(NSDate());
         updateLabel();
+        //spinnerView.move(3600, speed:1);
     }
     //MARK: - view
     
@@ -57,12 +58,8 @@ class NowVC: UIViewController {
         view.addSubview(vi);
         //vi.backgroundColor = UIColor(red: 1, green: 0, blue: 0, alpha: 0.5);
         print("timeer scheduled");
+        //doAfterDelay(1.0, closure: {  self.spinnerView.move(15 * 60, speed: 1) }  )
         doAfterDelay(1.0, closure: { self.spinnerView.start() })
-        //spinnerView.addPartWithLengthOf(9000, color: UIColor.redColor());
-        //spinnerView.addPartWithLengthOf(18000, color: UIColor.yellowColor());
-
-
-        
         // Do any additional setup after loading the view.
     }
 
@@ -115,10 +112,9 @@ class NowVC: UIViewController {
 }
 
 extension NowVC: CycleSpinnerViewDelegate{
-    func askNewPartWithLengthOf() -> (NSTimeInterval, UIColor) {
-        let interval = scheduleParsor.nextWorkForDate(NSDate())!.last;
+    func propertyOfNewPartInCycleSpinnerView(cycleSpinnerView: CycleSpinnerView) -> (NSTimeInterval, UIColor) {
         var color: UIColor!
-        switch(Int(interval) % 3){
+        switch(random() % 3){
         case 0:
             color = UIColor.yellowColor();
         case 1:
@@ -128,7 +124,7 @@ extension NowVC: CycleSpinnerViewDelegate{
         default:
             assert(false)
         }
-        return (interval,color)
-        
+        return (3600*2,color)
     }
+
 }
