@@ -37,7 +37,7 @@ class NowVC: UIViewController {
     func timerFired(timer: NSTimer){ //a run loop updating the UI
         nowDateLabel.text = dateFormatter.stringFromDate(NSDate());
         updateLabel();
-        //spinnerView.move(3600, speed:1);
+        spinnerView.move(3600, speed:1);
     }
     //MARK: - view
     

@@ -17,14 +17,20 @@ class CycleSpinnerView: UIView {
     var radious: CGFloat!
     var SPINNER_HEIGHT:CGFloat = 44; //parameter
     var delegate: CycleSpinnerViewDelegate?;
-    var lengthenPartLayer: PartLayer!
+    var lengthenPartLayer: CALayer!
+    var layerDrawer: PartLayerDrawer!
     
 
     override init(frame: CGRect) {
         assert(frame.size.width == frame.size.height)
         super.init(frame: frame);
         radious = bounds.width * 0.8 / 2
-        lengthenPartLayer = PartLayer(rad: radious, frame: bounds)
+        lengthenPartLayer = CALayer();
+        lengthenPartLayer.frame = self.bounds
+        layerDrawer = PartLayerDrawer(pos: lengthenPartLayer.position, radious: radious)
+        lengthenPartLayer.delegate = layerDrawer
+        lengthenPartLayer.shouldRasterize = true;
+        
         self.layer.addSublayer(lengthenPartLayer)
         self.layer.shadowColor = UIColor.blueColor().CGColor;
         self.layer.shadowOpacity = 1.0;
@@ -36,15 +42,18 @@ class CycleSpinnerView: UIView {
     }
     
     //MARK: - Drawing
+    /*
     override func drawRect(rect: CGRect) {
         let centerPoint:CGPoint = CGPoint(x: bounds.width/2, y: bounds.height/2)
         let path = UIBezierPath(ovalInRect: CGRect(x: centerPoint.x - radious, y: centerPoint.y - radious, width: 2*radious, height: 2*radious))
         //let path = UIBezierPath(arcCenter: centerPoint, radius: radious, startAngle: 0, endAngle: 1.8, clockwise: true)
         path.lineWidth = 20.0;
-        UIColor.yellowColor().setStroke()
+        UIColor.blueColor().setStroke()
         path.stroke();
+        
 
     }
+    */
     //MARK: - manipulation
 
     func start(){ // show the start
@@ -72,13 +81,13 @@ class CycleSpinnerView: UIView {
         if(bufferLength < 5){
             addPart();
         }
-        if lengthenPartLayer.arcs.isEmpty {
+        if layerDrawer.arcs.isEmpty {
             engine.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
             print("animation stop because no sublayers")
             return
         }
         destinationRad -= speed
-        lengthenPartLayer.proceed(speed)
+        layerDrawer.proceed(speed)
         lengthenPartLayer.setNeedsDisplay()
         if destinationRad <= 0 {
             engine.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
@@ -87,14 +96,14 @@ class CycleSpinnerView: UIView {
     }
     private func addPart()->Bool{ //asking the delegate for the property once
         guard let tup = delegate?.propertyOfNewPartInCycleSpinnerView(self) else{ return false }
-        let arc = ArcInLayer(headAngel: 270+bufferLength, length: degreeInSpinner(tup.0), color: tup.1.CGColor, isValid: true)
-        lengthenPartLayer.arcs.insert(arc, atIndex: 0)
+        let arc = ArcInLayer(headAngel: 270+bufferLength, length: degreeInSpinner(tup.0), color: tup.1, alpha: 0.0)
+        layerDrawer.arcs.insert(arc, atIndex: 0)
         print("subview added")
         return true;
     }
     var bufferLength: CGFloat {
         get{
-            guard let lay = lengthenPartLayer.arcs.first else {return 0}
+            guard let lay = layerDrawer.arcs.first else {return 0}
             return lay.headAngel + lay.length - 270
         }
     }
@@ -103,67 +112,54 @@ class CycleSpinnerView: UIView {
        return  CGFloat(length)  * 2 * 180 / (3600 * 24);
     }
     private func startEngine(){
-        //engine = NSTimer(timeInterval: 0.016, target: self, selector: Selector("updateFrame"), userInfo: nil, repeats:true)
-        //engine?.tolerance = 0.005
         engine.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-       // NSRunLoop.currentRunLoop().addTimer(engine!, forMode: NSDefaultRunLoopMode)
+
     }
     
 }
 struct ArcInLayer{
     var headAngel:CGFloat
     var length: CGFloat
-    var color: CGColorRef
-    var isValid: Bool
+    var color: UIColor
+    var alpha: CGFloat
 }
-class PartLayer: CALayer{
+class PartLayerDrawer: NSObject{
     let LINE_WIDTH: CGFloat = 20.0
     let offset: CGSize = CGSize(width: -3, height: 3)
+    var position: CGPoint!
     var radious: CGFloat!
     var arcs = [ArcInLayer]();
-    init(rad: CGFloat, frame: CGRect) {
-        radious = rad;
-        super.init();
-        self.frame = frame
-        delegate = nil
-    }
-    required init?(coder aDecoder: NSCoder) {
-        assert(false)
-        super.init(coder: aDecoder)
+    init(pos: CGPoint, radious: CGFloat) {
+        position = pos
+        self.radious = radious
     }
     func proceed(deg: CGFloat){ //headAngel varient from 270 -----> -90 -------> -90-length
-        for(var i = 0; i != arcs.count; ++i) {
+        for(var i = 0; i < arcs.count; ++i) {
             if(arcs[i].headAngel - deg < -90){ //headAngel - deg is the head position after proceed
                 arcs[i].headAngel = -90;
                 arcs[i].length =  arcs[i].headAngel - deg + arcs[i].length - (-90)
             }else{
                 arcs[i].headAngel -= deg//rotation
             }
-            
+            if(arcs[i].headAngel < 270 && arcs[i].headAngel > 270 - 60){ //gradient zone 270 ---> 210
+                arcs[i].alpha = (270-arcs[i].headAngel)/60
+            }else if (arcs[i].headAngel < 270 - 60){
+                arcs[i].alpha = 1.0
+            }
             if(arcs[i].headAngel + arcs[i].length < -90){
                 arcs.removeAtIndex(i)
                 print("arc removed")
             }
         }
-        /*
-        if(headAngel > 270){
-            self.opacity = 0
-        }else if(headAngel > 270 - 90){ //adjust opacity gradient zone of 20 degree!!
-            self.opacity = Float( (270 - headAngel) / CGFloat(90) )
-        }else{
-            self.opacity = 1.0
-        }*/
-
     }
-    
-    override func drawInContext(ctx: CGContext) {
+    override func drawLayer(layer: CALayer, inContext ctx: CGContext) {
         for(var i=0; i != arcs.count ; ++i){
             let rad = degree2Rad(arcs[i].headAngel)
             CGContextSaveGState(ctx)
-            CGContextSetShouldAntialias(ctx, true)
+            //CGContextSetShouldAntialias(ctx, true)
             CGContextSetAllowsAntialiasing(ctx, true)
             CGContextSetShadowWithColor(ctx, offset, 3, UIColor.blackColor().CGColor)
-            CGContextSetStrokeColorWithColor(ctx, arcs[i].color)
+            CGContextSetStrokeColorWithColor(ctx, arcs[i].color.colorWithAlphaComponent(arcs[i].alpha).CGColor)
             CGContextSetLineWidth(ctx, LINE_WIDTH)
             CGContextSetLineCap(ctx, .Round)
             CGContextMoveToPoint(ctx,position.x + radious*cos(rad), position.y + radious*sin(rad))
@@ -173,7 +169,7 @@ class PartLayer: CALayer{
             CGContextStrokePath(ctx)
             CGContextRestoreGState(ctx)
         }
-        
     }
+
 }
 
