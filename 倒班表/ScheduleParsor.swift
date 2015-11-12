@@ -255,7 +255,7 @@ class ScheduleParsor: NSObject, NSCoding{
     private func midNightOfDate(date: NSDate) -> NSDate{
         return calendar.startOfDayForDate(date);
     }
-    private func date(date: NSDate, afterdays days: Int) -> NSDate{
+    func date(date: NSDate, afterdays days: Int) -> NSDate{
         let comp = calendar.components([.Year, .Month, .Day], fromDate: date)
         comp.day += days;
         return calendar.dateFromComponents(comp)!;

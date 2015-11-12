@@ -13,6 +13,7 @@ class NowVC: UITableViewController {
     weak var dataLib: DataLib!
     weak var scheduleParsor: ScheduleParsor!;
     var headerView: NowHeaderView!
+    var tiCache: [NSTimeInterval]!
     var updateTime: NSDate!
     lazy var dateFormatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .ShortStyle
@@ -25,10 +26,11 @@ class NowVC: UITableViewController {
     //MARK: - Actions
     func timerFired(timer: NSTimer){ //a run loop updating the UI
         print("fired")
-        updateLabel();
         let now  = NSDate()
         headerView.spinnerView.move(now.timeIntervalSinceDate(updateTime), speed:0.5);
         updateTime = now;
+        updateLabel();
+
     }
     //MARK: - view
     
@@ -38,16 +40,19 @@ class NowVC: UITableViewController {
         let viewsInNib = nib.instantiateWithOwner(nil,options: nil) as! [NowHeaderView]
         headerView = viewsInNib[0]
         headerView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 400)
+        headerView.spinnerView.delegate = self
         tableView.tableHeaderView = headerView
-        NSTimer.scheduledTimerWithTimeInterval(10, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
+        let timer = NSTimer(timeInterval: 60*5, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
+        timer.tolerance = 60;
+        NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSDefaultRunLoopMode)
         scheduleParsor = dataLib.scheduleParsor;
-        updateLabel();
+        tiCache = scheduleParsor.intervalsWithin25HFrom(NSDate());
+        print(tiCache)
         print("timeer scheduled");
-        print(self.tableView.frame)
-        print(self.view.bounds)
         doAfterDelay(0.5, closure: {
             self.headerView.spinnerView.start();
             self.updateTime = NSDate()
+            self.updateLabel()
         })
     }
 
@@ -59,7 +64,7 @@ class NowVC: UITableViewController {
     //MARK: - utilities
     private func updateLabel(){
         headerView.scheduleLabel.text = scheduleParsor.schedule?.title
-        headerView.todayLabel.text = dateFormatter.stringFromDate(NSDate())
+        headerView.todayLabel.text = dateFormatter.stringFromDate(updateTime)
         
     }
     //MARK: - tableView delegate/ dataSource
@@ -78,24 +83,12 @@ class NowVC: UITableViewController {
     }
 }
 
-
-
-class NowHeaderView: UIView{
-    @IBOutlet weak var todayLabel: UILabel!
-    @IBOutlet weak var spinnerView: CycleSpinnerView!
-    @IBOutlet weak var scheduleLabel: UILabel!
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        spinnerView.delegate = self
-        print(spinnerView.frame)
-    }
-}
-extension NowHeaderView: CycleSpinnerViewDelegate{
+extension NowVC: CycleSpinnerViewDelegate{
     func propertyOfNewPartInCycleSpinnerView(cycleSpinnerView: CycleSpinnerView) -> (NSTimeInterval, UIColor) {
         var color: UIColor!
         switch(random() % 3){
         case 0:
-            color = UIColor.yellowColor();
+            color = UIColor.blueColor();
         case 1:
             color = UIColor.redColor();
         case 2:
@@ -103,7 +96,26 @@ extension NowHeaderView: CycleSpinnerViewDelegate{
         default:
             assert(false)
         }
-        return (3600*2,color)
+        var len: NSTimeInterval!
+        if tiCache.isEmpty{
+            let date = scheduleParsor.date(NSDate(),afterdays:1);
+            len = scheduleParsor.workForDate(date)?.last
+        }else{
+            len = tiCache[0];
+            tiCache.removeAtIndex(0)
+        }
+        return (len,color)
     }
     
 }
+
+class NowHeaderView: UIView{
+    @IBOutlet weak var todayLabel: UILabel!
+    @IBOutlet weak var spinnerView: CycleSpinnerView!
+    @IBOutlet weak var scheduleLabel: UILabel!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        print(spinnerView.frame)
+    }
+}
+

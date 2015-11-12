@@ -64,7 +64,9 @@ class CycleSpinnerView: UIView {
     //MARK: - manipulation
 
     func start(){ // show the start
-        addPart()
+        while(bufferLength < 360){
+            addPart()
+        }
         move(3600*24, speed:  9.0)
     }
     func stop(){ // show stop animation;
