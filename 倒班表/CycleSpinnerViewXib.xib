@@ -63,8 +63,8 @@
                 <constraint firstItem="oiC-KK-giG" firstAttribute="top" secondItem="TRw-Ss-yKK" secondAttribute="bottom" constant="22" id="fxb-AY-o7s"/>
             </constraints>
             <connections>
-                <outlet property="headerView" destination="g2b-k8-FFT" id="0Mb-au-AqW"/>
                 <outlet property="scheduleLabel" destination="dmk-wR-3tF" id="Sgr-Mm-3QG"/>
+                <outlet property="spinnerView" destination="g2b-k8-FFT" id="c7U-vQ-ZZG"/>
                 <outlet property="todayLabel" destination="Ejp-dU-0wQ" id="2de-eP-vek"/>
             </connections>
             <point key="canvasLocation" x="299" y="195"/>

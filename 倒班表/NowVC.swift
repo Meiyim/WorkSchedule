@@ -13,6 +13,7 @@ class NowVC: UITableViewController {
     weak var dataLib: DataLib!
     weak var scheduleParsor: ScheduleParsor!;
     var headerView: NowHeaderView!
+    var updateTime: NSDate!
     lazy var dateFormatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateStyle = .ShortStyle
         ret.timeStyle = .MediumStyle;
@@ -23,8 +24,11 @@ class NowVC: UITableViewController {
     //MAKR: - Outlets
     //MARK: - Actions
     func timerFired(timer: NSTimer){ //a run loop updating the UI
+        print("fired")
         updateLabel();
-        //headerView.spinnerView.move(3600, speed:1);
+        let now  = NSDate()
+        headerView.spinnerView.move(now.timeIntervalSinceDate(updateTime), speed:0.5);
+        updateTime = now;
     }
     //MARK: - view
     
@@ -35,13 +39,16 @@ class NowVC: UITableViewController {
         headerView = viewsInNib[0]
         headerView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 400)
         tableView.tableHeaderView = headerView
-        NSTimer.scheduledTimerWithTimeInterval(5, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(10, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
         scheduleParsor = dataLib.scheduleParsor;
         updateLabel();
         print("timeer scheduled");
         print(self.tableView.frame)
         print(self.view.bounds)
-        //doAfterDelay(2.0, closure: { self.headerView.spinnerView.start() })
+        doAfterDelay(0.5, closure: {
+            self.headerView.spinnerView.start();
+            self.updateTime = NSDate()
+        })
     }
 
     override func didReceiveMemoryWarning() {
@@ -51,19 +58,9 @@ class NowVC: UITableViewController {
     
     //MARK: - utilities
     private func updateLabel(){
+        headerView.scheduleLabel.text = scheduleParsor.schedule?.title
+        headerView.todayLabel.text = dateFormatter.stringFromDate(NSDate())
         
-        if scheduleParsor.isApplying {
-            let now = NSDate();
-            let work = scheduleParsor.workForDate(now);
-            if work is BreakPart {
-
-            }else{
-
-            }
-
-        }else{
-
-        }
     }
     //MARK: - tableView delegate/ dataSource
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -81,7 +78,19 @@ class NowVC: UITableViewController {
     }
 }
 
-extension NowVC: CycleSpinnerViewDelegate{
+
+
+class NowHeaderView: UIView{
+    @IBOutlet weak var todayLabel: UILabel!
+    @IBOutlet weak var spinnerView: CycleSpinnerView!
+    @IBOutlet weak var scheduleLabel: UILabel!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        spinnerView.delegate = self
+        print(spinnerView.frame)
+    }
+}
+extension NowHeaderView: CycleSpinnerViewDelegate{
     func propertyOfNewPartInCycleSpinnerView(cycleSpinnerView: CycleSpinnerView) -> (NSTimeInterval, UIColor) {
         var color: UIColor!
         switch(random() % 3){
@@ -96,16 +105,5 @@ extension NowVC: CycleSpinnerViewDelegate{
         }
         return (3600*2,color)
     }
-
-}
-
-
-class NowHeaderView: UIView{
-    @IBOutlet weak var todayLabel: UILabel!
-    @IBOutlet weak var headerView: UIView!
-    @IBOutlet weak var scheduleLabel: UILabel!
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        print(headerView.frame)
-    }
+    
 }
