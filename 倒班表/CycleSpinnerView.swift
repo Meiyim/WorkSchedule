@@ -24,6 +24,17 @@ class CycleSpinnerView: UIView {
     override init(frame: CGRect) {
         assert(frame.size.width == frame.size.height)
         super.init(frame: frame);
+        prepare()
+
+    }
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder);
+        assert(frame.width == frame.height)
+        prepare()
+    }
+    private func prepare(){
+        self.backgroundColor = UIColor.clearColor()
+        self.opaque = false
         radious = bounds.width * 0.8 / 2
         lengthenPartLayer = CALayer();
         lengthenPartLayer.frame = self.bounds
@@ -37,23 +48,19 @@ class CycleSpinnerView: UIView {
         self.layer.shadowOffset = CGSize(width: -2.0, height: 4.0);
         engine =  CADisplayLink(target: self, selector: Selector("updateFrame"))
     }
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder);
-    }
-    
     //MARK: - Drawing
-    /*
+    
     override func drawRect(rect: CGRect) {
         let centerPoint:CGPoint = CGPoint(x: bounds.width/2, y: bounds.height/2)
         let path = UIBezierPath(ovalInRect: CGRect(x: centerPoint.x - radious, y: centerPoint.y - radious, width: 2*radious, height: 2*radious))
         //let path = UIBezierPath(arcCenter: centerPoint, radius: radious, startAngle: 0, endAngle: 1.8, clockwise: true)
         path.lineWidth = 20.0;
-        UIColor.blueColor().setStroke()
+        UIColor.yellowColor().setStroke()
         path.stroke();
         
 
     }
-    */
+    
     //MARK: - manipulation
 
     func start(){ // show the start
@@ -124,7 +131,7 @@ struct ArcInLayer{
     var alpha: CGFloat
 }
 class PartLayerDrawer: NSObject{
-    let LINE_WIDTH: CGFloat = 20.0
+    let LINE_WIDTH: CGFloat = 12.0
     let offset: CGSize = CGSize(width: -3, height: 3)
     var position: CGPoint!
     var radious: CGFloat!
@@ -164,7 +171,6 @@ class PartLayerDrawer: NSObject{
             CGContextSetLineCap(ctx, .Round)
             CGContextMoveToPoint(ctx,position.x + radious*cos(rad), position.y + radious*sin(rad))
             CGContextAddArc(ctx, position.x, position.y, radious, rad ,  rad + degree2Rad(arcs[i].length), 0)
-            
             //CGContextAddEllipseInRect(ctx, CGRectMake(position.x - radious, position.y - radious, 2*radious, 2*radious))
             CGContextStrokePath(ctx)
             CGContextRestoreGState(ctx)
