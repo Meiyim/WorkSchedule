@@ -40,7 +40,7 @@ class CycleSpinnerView: UIView {
         lengthenPartLayer.frame = self.bounds
         layerDrawer = PartLayerDrawer(pos: lengthenPartLayer.position, radious: radious)
         lengthenPartLayer.delegate = layerDrawer
-        lengthenPartLayer.shouldRasterize = true;
+        lengthenPartLayer.shouldRasterize = false;
         
         self.layer.addSublayer(lengthenPartLayer)
         self.layer.shadowColor = UIColor.blueColor().CGColor;
@@ -51,6 +51,11 @@ class CycleSpinnerView: UIView {
     //MARK: - Drawing
     
     override func drawRect(rect: CGRect) {
+        for _ in 0 ..< 360{
+            layerDrawer.frameCache.append(CGLayerCreateWithContext(UIGraphicsGetCurrentContext(),
+                                                       CGSize(width: bounds.width,height: bounds.height),
+                                                        nil)!)
+        }
         let centerPoint:CGPoint = CGPoint(x: bounds.width/2, y: bounds.height/2)
         let path = UIBezierPath(ovalInRect: CGRect(x: centerPoint.x - radious, y: centerPoint.y - radious, width: 2*radious, height: 2*radious))
         //let path = UIBezierPath(arcCenter: centerPoint, radius: radious, startAngle: 0, endAngle: 1.8, clockwise: true)
@@ -75,6 +80,7 @@ class CycleSpinnerView: UIView {
     func move(seconds: NSTimeInterval, speed: CGFloat){
         self.speed = speed
         destinationRad = degreeInSpinner(seconds)
+        preRender();
         startEngine()
     }
     //MARK: - frame animation
@@ -82,26 +88,36 @@ class CycleSpinnerView: UIView {
     var destinationRad: CGFloat = 0.0;
     var speed: CGFloat = 1.0 // speed in degree
     var count = 0;
+
     var last = CFAbsoluteTimeGetCurrent();
+    private func preRender(){
+        layerDrawer.cacheCount = 0
+        layerDrawer.drawCount = 0
+        while(destinationRad > 0){
+            if(bufferLength < 5){
+                addPart();
+            }
+            if layerDrawer.arcs.isEmpty {
+                print("no arcs to be displayed")
+                return
+            }
+            destinationRad -= speed
+            layerDrawer.proceed(speed)
+            
+        }
+        print("PreRenderDone")
+    }
     func updateFrame(){
         let now = CFAbsoluteTimeGetCurrent();
         print("frame count: \(count++) involk timeInterval\(now - last)")
         last = now;
-        if(bufferLength < 5){
-            addPart();
-        }
-        if layerDrawer.arcs.isEmpty {
-            engine.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-            print("animation stop because no sublayers")
-            return
-        }
-        destinationRad -= speed
-        layerDrawer.proceed(speed)
-        lengthenPartLayer.setNeedsDisplay()
-        if destinationRad <= 0 {
+        if layerDrawer.drawCount == layerDrawer.cacheCount {
             engine.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
             print("engine is out")
+        }else{
+            lengthenPartLayer.setNeedsDisplay()
         }
+
     }
     private func addPart()->Bool{ //asking the delegate for the property once
         guard let tup = delegate?.propertyOfNewPartInCycleSpinnerView(self) else{ return false }
@@ -137,6 +153,9 @@ class PartLayerDrawer: NSObject{
     let offset: CGSize = CGSize(width: -3, height: 3)
     var position: CGPoint!
     var radious: CGFloat!
+    var frameCache = [CGLayer]()
+    var cacheCount = 0
+    var drawCount = 0
     var arcs = [ArcInLayer]();
     init(pos: CGPoint, radious: CGFloat) {
         position = pos
@@ -160,8 +179,7 @@ class PartLayerDrawer: NSObject{
                 print("arc removed")
             }
         }
-    }
-    override func drawLayer(layer: CALayer, inContext ctx: CGContext) {
+        let ctx = CGLayerGetContext(frameCache[cacheCount++])
         for(var i=0; i != arcs.count ; ++i){
             let rad = degree2Rad(arcs[i].headAngel)
             CGContextSaveGState(ctx)
@@ -177,6 +195,9 @@ class PartLayerDrawer: NSObject{
             CGContextStrokePath(ctx)
             CGContextRestoreGState(ctx)
         }
+    }
+    override func drawLayer(layer: CALayer, inContext ctx: CGContext) {
+        CGContextDrawLayerAtPoint(ctx, CGPoint(x: 0, y: 0), frameCache[drawCount++])
     }
 
 }

@@ -44,15 +44,15 @@ class NowVC: UITableViewController {
         tableView.tableHeaderView = headerView
         let timer = NSTimer(timeInterval: 60*5, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
         timer.tolerance = 60;
-        NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSDefaultRunLoopMode)
+        //NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSDefaultRunLoopMode)
         scheduleParsor = dataLib.scheduleParsor;
         tiCache = scheduleParsor.intervalsWithin25HFrom(NSDate());
         print(tiCache)
         print("timeer scheduled");
-        doAfterDelay(0.5, closure: {
+        doAfterDelay(2.0, closure: {
             self.headerView.spinnerView.start();
-            self.updateTime = NSDate()
-            self.updateLabel()
+            //self.updateTime = NSDate()
+            //self.updateLabel()
         })
     }
 
@@ -104,7 +104,7 @@ extension NowVC: CycleSpinnerViewDelegate{
             len = tiCache[0];
             tiCache.removeAtIndex(0)
         }
-        return (len,color)
+        return (2*3600,color)
     }
     
 }
