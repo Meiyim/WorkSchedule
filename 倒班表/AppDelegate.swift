@@ -22,7 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let navigationCont = tabBarVCs[2] as! UINavigationController;
             let schedulesVC = navigationCont.viewControllers[0] as! SchedulesVC
             schedulesVC.dataLib = self.dataLib;
-            let nowvc = tabBarVCs[0] as! NowVC
+            let navigationCont2 = tabBarVCs[0] as! UINavigationController
+            let nowvc = navigationCont2.viewControllers[0] as! NowVC
             nowvc.dataLib = dataLib;
         }
         return true

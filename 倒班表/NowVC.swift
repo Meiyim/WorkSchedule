@@ -11,13 +11,12 @@ import UIKit
 class NowVC: UITableViewController {
     //MARK: - properties
     weak var dataLib: DataLib!
-    weak var scheduleParsor: ScheduleParsor!;
+    weak var scheduleParsor: ScheduleParsor!
     var headerView: NowHeaderView!
     var tiCache: [NSTimeInterval]!
     var updateTime: NSDate!
     lazy var dateFormatter: NSDateFormatter = { let ret = NSDateFormatter();
-        ret.dateStyle = .ShortStyle
-        ret.timeStyle = .MediumStyle;
+        ret.dateFormat = "MM/dd"
         return ret;}()
     lazy var timeFormatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateFormat = "HH:mm"
@@ -33,8 +32,8 @@ class NowVC: UITableViewController {
 
     }
     //MARK: - view
-    
     override func viewDidLoad() {
+        scheduleParsor = dataLib.scheduleParsor;
         super.viewDidLoad()
         let nib = UINib(nibName: "CycleSpinnerViewXib", bundle: nil)
         let viewsInNib = nib.instantiateWithOwner(nil,options: nil) as! [NowHeaderView]
@@ -42,17 +41,21 @@ class NowVC: UITableViewController {
         headerView.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 400)
         headerView.spinnerView.delegate = self
         tableView.tableHeaderView = headerView
+        navigationItem.title = "Now"
+        
+        let nib2 = UINib(nibName: "NowTableViewCell", bundle: nil)
+        tableView.registerNib(nib2, forCellReuseIdentifier: "NowTableCell")
+        
         let timer = NSTimer(timeInterval: 60*5, target: self, selector: Selector("timerFired:"), userInfo: nil, repeats: true)
         timer.tolerance = 60;
-        //NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSDefaultRunLoopMode)
-        scheduleParsor = dataLib.scheduleParsor;
+        NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSDefaultRunLoopMode)
         tiCache = scheduleParsor.intervalsWithin25HFrom(NSDate());
-        print(tiCache)
+        self.updateTime = NSDate()
+        self.updateLabel()
+
         print("timeer scheduled");
-        doAfterDelay(2.0, closure: {
+        doAfterDelay(2.5, closure: {
             self.headerView.spinnerView.start();
-            //self.updateTime = NSDate()
-            //self.updateLabel()
         })
     }
 
@@ -67,18 +70,51 @@ class NowVC: UITableViewController {
         headerView.todayLabel.text = dateFormatter.stringFromDate(updateTime)
         
     }
+    private func cellHeightForPart(part: Part)->CGFloat{
+        if part is BreakPart{
+            return 44
+        }else{
+            return  CGFloat( 44 * 3 * Int(part.last) / Int(24 * 3600))
+        }
+    }
     //MARK: - tableView delegate/ dataSource
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 22
+    }
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        if scheduleParsor == nil {return 0}
+        if scheduleParsor.isApplying {
+            return 100
+        }else{
+            return 0
+        }
+    }
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return dateFormatter.stringFromDate(scheduleParsor.dateForSection(section))
     }
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        if let rows = scheduleParsor.numberOfWorksForIndexPath(NSIndexPath(forRow: 0, inSection: section)){
+            return rows
+        }else{
+            return 0;
+        }
+    }
+    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return cellHeightForPart(scheduleParsor.workForIndexPath(indexPath)!)
+    }
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return cellHeightForPart(scheduleParsor.workForIndexPath(indexPath)!)
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("NowVCCell", forIndexPath: indexPath)
-        cell.textLabel?.text = "good"
-        cell.detailTextLabel?.text = "great"
-        
+        let part = scheduleParsor.workForIndexPath(indexPath)!
+        let cell = tableView.dequeueReusableCellWithIdentifier("NowTableCell", forIndexPath: indexPath) as! NowTableCell
+        if part is BreakPart{
+            cell.title.text = "BreakPart"
+            cell.descrip.text = "have a rest~"
+        }else{
+            cell.title.text = part.title
+            cell.descrip.text = part.descriptionIn24h
+        }
         return cell
     }
 }
@@ -104,7 +140,7 @@ extension NowVC: CycleSpinnerViewDelegate{
             len = tiCache[0];
             tiCache.removeAtIndex(0)
         }
-        return (2*3600,color)
+        return (len,color)
     }
     
 }
@@ -116,6 +152,17 @@ class NowHeaderView: UIView{
     override func awakeFromNib() {
         super.awakeFromNib()
         print(spinnerView.frame)
+    }
+}
+class NowTableCell: UITableViewCell{
+    
+    @IBOutlet weak var colorBar: UIView!
+    @IBOutlet weak var descrip: UILabel!
+    @IBOutlet weak var title: UILabel!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        colorBar.layer.cornerRadius = 7
+        descrip.textColor = UIColor.grayColor()
     }
 }
 

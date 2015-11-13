@@ -119,8 +119,8 @@ class ScheduleParsor: NSObject, NSCoding{
         case .Canceled:
             break;
         case .Swap(let tuple):
-            //let swapFromDate = tuple.0;
-            //let swapToDate = tuple.1;
+            let _ = tuple.0;
+            let _ = tuple.1;
             break;
         }
     }
@@ -150,7 +150,7 @@ class ScheduleParsor: NSObject, NSCoding{
             return NSIndexPath(forRow: indexPath.row + 1, inSection: indexPath.section);
         }
     }
-    func numberOfWorksForIndexPath(id: NSIndexPath) -> Int?{  // obtain data from schedule
+    func numberOfWorksForIndexPath(id: NSIndexPath) -> Int?{  // number of works in a day
         return schedule?.numberOfWorksInDay(dayList[ id.section])
     }
     func workForIndexPath(id: NSIndexPath) -> Part?{
@@ -242,6 +242,9 @@ class ScheduleParsor: NSObject, NSCoding{
             let dif = NSDate().timeIntervalSinceDate( dateForDayNo(i)! );
             return dif / Double(schedule!.lastDays * 3600 * 24)
         }
+    }
+    func dateForSection(sec: Int) -> NSDate{
+        return date(applyDate!, afterdays: sec)
     }
     //MARK: - utilities
     private func timeIntervalToDate(time: NSTimeInterval) -> NSDate{
