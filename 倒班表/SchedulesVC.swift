@@ -88,7 +88,7 @@ class SchedulesVC: UITableViewController {
     // MARK: - utilities
     private func applySchedule(schedule: Schedule?, toDate: NSDate?){ // will set the cell at 1-0 to tint color
         if let sched = schedule{
-            dataLib.scheduleParsor.apply(sched, date: toDate!)
+            dataLib.scheduleParsor.apply(sched, date: toDate!,animated:  true)
         }else{
             dataLib.scheduleParsor.clear();
         }
@@ -173,7 +173,7 @@ extension SchedulesVC: ScheduleManagemenVCDelegate {
     }
     func scheduleManagementVC(scheduleApplied schedule: Schedule, toDate: NSDate){
         dataLib.scheduleParsor.clear();
-        scheduleManagementVC(commitChange: schedule, completion:{self.dataLib.scheduleParsor.apply(schedule, date: toDate)});
+        scheduleManagementVC(commitChange: schedule, completion:{self.dataLib.scheduleParsor.apply(schedule, date: toDate,animated: true)});
         print("schedule:\(schedule.title) applied")
     }
     func scheduleManagementVC(cancelSchedule schedule: Schedule, retreatToSchedule ori: Schedule){

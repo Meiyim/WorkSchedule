@@ -71,6 +71,8 @@ class ScheduleParsor: NSObject, NSCoding{
     var vacations = [Vacation]()
     var calendar = NSCalendar(identifier: "gregorian")!
     var dayList = [Int]();
+    //MARK: - weak observer;
+    weak var spinnerView: CycleSpinnerView!
     //MARK: - initialization
     override init(){
         schedule = nil;
@@ -86,7 +88,7 @@ class ScheduleParsor: NSObject, NSCoding{
         super.init();
         if let date = aDecoder.decodeObjectForKey("applyDate") as? NSDate{
             if let sched = aDecoder.decodeObjectForKey("schedule") as? Schedule{
-                apply(sched, date: date);
+                apply(sched, date: date,animated: false);
             }
         }
     }
@@ -96,7 +98,7 @@ class ScheduleParsor: NSObject, NSCoding{
         aCoder.encodeObject(schedule, forKey: "schedule");
     }
     //MARK: - settings
-    func apply(sched: Schedule, date: NSDate){ //argument could be nil
+    func apply(sched: Schedule, date: NSDate, animated: Bool){ //argument could be nil
         schedule = sched.mutableCopy() as? Schedule;
         applyDate = calendar.startOfDayForDate(date)
         schedule?.isInEdittingMode = false
@@ -104,6 +106,9 @@ class ScheduleParsor: NSObject, NSCoding{
         for _ in 0..<365 {
             dayList.append(dayNo);
             if(++dayNo == schedule?.lastDays){dayNo = 0}
+        }
+        if(animated){
+            spinnerView.start();
         }
     }
     func clear(){

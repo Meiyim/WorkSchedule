@@ -32,7 +32,7 @@ class NowVC: UITableViewController {
 
     }
     //MARK: - view
-    override func viewDidLoad() {
+    override func viewDidLoad() {   // involk when first lauch app!!!!!
         scheduleParsor = dataLib.scheduleParsor;
         super.viewDidLoad()
         let nib = UINib(nibName: "CycleSpinnerViewXib", bundle: nil)
@@ -55,7 +55,9 @@ class NowVC: UITableViewController {
 
         print("timeer scheduled");
         doAfterDelay(2.5, closure: {
-            self.headerView.spinnerView.start();
+            if(self.scheduleParsor.isApplying){
+                self.headerView.spinnerView.start();
+            }
         })
     }
 
@@ -162,6 +164,7 @@ class NowTableCell: UITableViewCell{
     override func awakeFromNib() {
         super.awakeFromNib()
         colorBar.layer.cornerRadius = 7
+        colorBar.backgroundColor = tintColor;
         descrip.textColor = UIColor.grayColor()
     }
 }

@@ -31,31 +31,29 @@
                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kpe-vK-E19">
-                        <rect key="frame" x="117" y="1" width="11" height="43"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Csk-CI-3kN">
+                        <rect key="frame" x="128" y="0.0" width="9" height="43"/>
                         <animations/>
-                        <color key="backgroundColor" red="0.58957435344827591" green="0.68588362068965514" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="11" id="XVZ-Tj-OEV"/>
+                            <constraint firstAttribute="width" constant="9" id="Eas-7t-1bW"/>
                         </constraints>
                     </view>
                 </subviews>
                 <animations/>
                 <constraints>
                     <constraint firstItem="rEe-iS-fQe" firstAttribute="centerY" secondItem="UB5-tT-iqZ" secondAttribute="centerY" id="2et-GW-7mg"/>
-                    <constraint firstItem="kpe-vK-E19" firstAttribute="leading" secondItem="cU9-qn-ZWO" secondAttribute="trailing" constant="11" id="WpW-fL-xrd"/>
-                    <constraint firstItem="kpe-vK-E19" firstAttribute="height" secondItem="UB5-tT-iqZ" secondAttribute="height" id="gTT-yA-BSt"/>
+                    <constraint firstItem="Csk-CI-3kN" firstAttribute="top" secondItem="UB5-tT-iqZ" secondAttribute="top" id="hFC-RS-uEh"/>
+                    <constraint firstAttribute="bottom" secondItem="Csk-CI-3kN" secondAttribute="bottom" id="jSh-pH-XgX"/>
                     <constraint firstAttribute="trailingMargin" secondItem="rEe-iS-fQe" secondAttribute="trailing" id="kb4-7F-KUK"/>
+                    <constraint firstItem="Csk-CI-3kN" firstAttribute="leading" secondItem="UB5-tT-iqZ" secondAttribute="leadingMargin" constant="120" id="oMG-w8-nJy"/>
                     <constraint firstItem="cU9-qn-ZWO" firstAttribute="centerY" secondItem="UB5-tT-iqZ" secondAttribute="centerY" id="pVB-Yf-cQC"/>
                     <constraint firstItem="cU9-qn-ZWO" firstAttribute="leading" secondItem="UB5-tT-iqZ" secondAttribute="leadingMargin" constant="10" id="s04-F5-1VH"/>
                 </constraints>
             </tableViewCellContentView>
             <animations/>
-            <constraints>
-                <constraint firstAttribute="bottom" secondItem="kpe-vK-E19" secondAttribute="bottom" id="ffE-Iy-rAN"/>
-            </constraints>
             <connections>
-                <outlet property="colorBar" destination="kpe-vK-E19" id="vHI-1R-ABV"/>
+                <outlet property="colorBar" destination="Csk-CI-3kN" id="VG2-Pv-nRf"/>
                 <outlet property="descrip" destination="rEe-iS-fQe" id="7Le-ck-SMG"/>
                 <outlet property="title" destination="cU9-qn-ZWO" id="LgC-xx-exe"/>
             </connections>

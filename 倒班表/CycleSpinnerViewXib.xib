@@ -17,15 +17,8 @@
                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(TodayLabel)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-dU-0wQ">
-                    <rect key="frame" x="456" y="44" width="100" height="21"/>
-                    <animations/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                    <nil key="highlightedColor"/>
-                </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(ScheduleLabel)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dmk-wR-3tF">
-                    <rect key="frame" x="456" y="87" width="125" height="21"/>
+                    <rect key="frame" x="412" y="87" width="125" height="21"/>
                     <animations/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -47,6 +40,13 @@
                         <constraint firstAttribute="width" constant="250" id="vz8-Nd-l6q"/>
                     </constraints>
                 </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(TodayLabel)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-dU-0wQ">
+                    <rect key="frame" x="412" y="44" width="100" height="21"/>
+                    <animations/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <animations/>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -57,7 +57,7 @@
                 <constraint firstItem="dmk-wR-3tF" firstAttribute="leading" secondItem="Ejp-dU-0wQ" secondAttribute="leading" id="F6p-zF-cJZ"/>
                 <constraint firstItem="dmk-wR-3tF" firstAttribute="top" secondItem="Ejp-dU-0wQ" secondAttribute="bottom" constant="22" id="Gmd-aS-Rfc"/>
                 <constraint firstItem="Ejp-dU-0wQ" firstAttribute="baseline" secondItem="TRw-Ss-yKK" secondAttribute="baseline" id="L0k-yQ-XUS"/>
-                <constraint firstAttribute="trailing" secondItem="Ejp-dU-0wQ" secondAttribute="trailing" constant="44" id="Ooi-LU-lHf"/>
+                <constraint firstAttribute="trailing" secondItem="Ejp-dU-0wQ" secondAttribute="trailing" constant="88" id="Ooi-LU-lHf"/>
                 <constraint firstItem="TRw-Ss-yKK" firstAttribute="top" secondItem="hFa-Wq-2lu" secondAttribute="top" constant="44" id="W1u-N6-dE4"/>
                 <constraint firstItem="g2b-k8-FFT" firstAttribute="centerX" secondItem="hFa-Wq-2lu" secondAttribute="centerX" id="Zbf-z8-Jdy"/>
                 <constraint firstItem="oiC-KK-giG" firstAttribute="top" secondItem="TRw-Ss-yKK" secondAttribute="bottom" constant="22" id="fxb-AY-o7s"/>
