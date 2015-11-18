@@ -82,11 +82,11 @@ class CycleSpinnerView: UIView {
     var destinationRad: CGFloat = 0.0;
     var speed: CGFloat = 1.0 // speed in degree
     var count = 0;
-    var last = CFAbsoluteTimeGetCurrent();
+    //var last = CFAbsoluteTimeGetCurrent();  //used to observe fps
     func updateFrame(){
-        let now = CFAbsoluteTimeGetCurrent();
-        print("frame count: \(count++) involk timeInterval\(now - last)")
-        last = now;
+        //let now = CFAbsoluteTimeGetCurrent();
+        //print("frame count: \(count++) involk timeInterval\(now - last)")
+        //last = now;
         if(bufferLength < 5){
             addPart();
         }
@@ -100,7 +100,6 @@ class CycleSpinnerView: UIView {
         lengthenPartLayer.setNeedsDisplay()
         if destinationRad <= 0 {
             engine.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSRunLoopCommonModes)
-            print("engine is out")
         }
     }
     private func addPart()->Bool{ //asking the delegate for the property once
