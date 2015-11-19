@@ -144,6 +144,7 @@ class NowVC: UITableViewController {
             cell.descrip.text = "have a rest~"
         }else{
             cell.title.text = part.title
+            //cell.descrip.text = "not good"
             cell.descrip.text = part.descriptionIn24h
         }
         return cell

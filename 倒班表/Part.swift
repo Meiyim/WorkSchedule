@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 class Part: NSObject, NSCoding, NSMutableCopying{
     var title = "";
     var isWork = true;
@@ -33,6 +34,7 @@ class Part: NSObject, NSCoding, NSMutableCopying{
             return end - begin + 1;
         }
     }
+    var color: UIColor = UIColor.grayColor(); //default color for part including breakPart
     var descriptionIn24h: String{
         return String(format: "%@ ~ %@",
             begin.formattedString,end.formattedString);

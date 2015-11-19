@@ -47,9 +47,11 @@ class NewWorkVC: UITableViewController {
             return 0;
         }
     }
+    var partColor: UIColor?
     weak var delegate: NewWorkVCDelegate?
     var timePickerIsVisible = false;
     var timePickerRow = 5;
+    var colorScroller: ColorScrollerView!
     //Mark: - Outlets
 
     @IBOutlet weak var shouldRemindSwitch: UISwitch!
@@ -88,10 +90,16 @@ class NewWorkVC: UITableViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.reloadData()
+        let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 2))!
+        colorScroller = ColorScrollerView(frame: cell.contentView.bounds)
+        colorScroller.target = self
+        cell.contentView.addSubview(colorScroller)
         if workToEdit == nil {
             beginTimeLabel.text = "0:00"
             endTimeLabel.text = "0:00"
             lastTimeLabel.text = "0:00"
+            partColor = generateRandomColor();
         }else {
             title = "编辑班种"
             doneButton.enabled = true;
@@ -99,12 +107,12 @@ class NewWorkVC: UITableViewController {
             endDate = workToEdit!.endDate;
             textField.text = workToEdit!.title;
             shouldRemindSwitch.on = workToEdit!.shouldRemind
+            partColor = workToEdit!.color
         }
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+        doAfterDelay(2.5, closure: {
+            self.colorScroller.scrollTo(self.partColor!)
+        })
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
     override func didReceiveMemoryWarning() {
@@ -177,6 +185,10 @@ class NewWorkVC: UITableViewController {
             }else{
                 showTimePickerForRow(indexPath.row);
             }
+        }else{
+            if timePickerIsVisible {
+                hideTimePicker()
+            }
         }
     }
     override func tableView(tableView: UITableView, var heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -240,7 +252,11 @@ class NewWorkVC: UITableViewController {
         tableView.deleteRowsAtIndexPaths([deleteID], withRowAnimation: .Fade)
         tableView.endUpdates();
     }
-
+    private func generateRandomColor()->UIColor{
+        let id = random() % colorScroller.colorVector.count
+        return colorScroller.colorVector[id]
+    }
+    //MARK: - Selectors!
     func timeChanged(picker: UIDatePicker){
         switch timePickerRow-1 {
         case 1:
@@ -254,6 +270,9 @@ class NewWorkVC: UITableViewController {
         }
         assert(timePickerIsVisible, "Picker is unVisible!!")
 
+    }
+    func colorPicked(button: UIButton){
+        print("colorPicked")
     }
 }
 
@@ -271,5 +290,56 @@ extension NewWorkVC: UITextFieldDelegate{
     }
     func textFieldDidBeginEditing(textField: UITextField) {
         hideTimePicker();
+    }
+}
+
+
+
+class ColorScrollerView: UIScrollView{
+    let SPACE: CGFloat = 100;
+    let BUTTON_WIDTH: CGFloat = 22;
+    var target: AnyObject!
+    var colorVector:[UIColor] = [
+        UIColor.blueColor(),
+        UIColor.greenColor(),
+        UIColor.yellowColor(),
+        UIColor.orangeColor(),
+        UIColor.purpleColor()
+    ]
+    func scrollTo(color: UIColor){
+        if let id = colorVector.indexOf(color){
+            let x = SPACE * CGFloat(id) + SPACE / 2
+            self.contentOffset = CGPoint(x: x, y: 0);
+        }else{
+            assert(false)
+        }
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.contentSize = CGSize(width: SPACE * CGFloat(colorVector.count), height: self.bounds.height)
+        var posiInX = SPACE / 2
+        for (var i = 0; i != colorVector.count; ++i){
+            let color = colorVector[i]
+            posiInX += SPACE;
+            let but = getButtonInColor(color, posi: posiInX)
+            but.tag = i;
+            self.addSubview(but)
+        }
+    }
+    required init?(coder aDecoder: NSCoder) {
+        assert(false)
+        super.init(coder: aDecoder)
+    }
+    private func getButtonInColor(color: UIColor,posi: CGFloat) -> UIButton{
+        let but = UIButton(type: .System)
+        but.frame = CGRect(x: posi - BUTTON_WIDTH / 2,
+            y: self.bounds.height / 2 - BUTTON_WIDTH / 2,
+            width: BUTTON_WIDTH,
+            height: BUTTON_WIDTH)
+        but.addTarget(target, action: Selector("colorPicked:"), forControlEvents: UIControlEvents.TouchUpInside)
+        but.backgroundColor = color;
+        but.layer.cornerRadius = BUTTON_WIDTH / 2;
+        return but;
     }
 }
