@@ -114,7 +114,7 @@ extension WorkManagementVC: NewWorkVCDelegate{
         if let id = dataLib.worksLib.indexOf(work){
             dataLib.worksLib[id] = work;
             tableView.reloadData();
-            print("work modified! \(work)");
+            print("work modified! \(work): now color is \(work.color)");
         }else{
             assert(false, "never should come here")
         }

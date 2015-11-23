@@ -69,9 +69,11 @@ class NewWorkVC: UITableViewController {
                     work.beginDate = beg;
                     work.endDate = end;
                     work.shouldRemind = shouldRemindSwitch.on;
+                    work.color = partColor!;
                     delegate?.editWork(work);
                 }else{
                     let work = Part(name: textField.text!, beginDate: beg, endDate: end,shouldRemind: shouldRemindSwitch.on)
+                    work.color = partColor!;
                     delegate?.appendNewWork(work)
                 }
                 print(beg);
@@ -109,8 +111,11 @@ class NewWorkVC: UITableViewController {
             shouldRemindSwitch.on = workToEdit!.shouldRemind
             partColor = workToEdit!.color
         }
+        
         doAfterDelay(2.5, closure: {
-            self.colorScroller.scrollTo(self.partColor!)
+            if let id = self.colorScroller.colorVector.indexOf(self.partColor!){
+                self.colorScroller.scrollTo(id)
+            }else{assert(false)}
         })
 
     }
@@ -272,7 +277,9 @@ class NewWorkVC: UITableViewController {
 
     }
     func colorPicked(button: UIButton){
-        print("colorPicked")
+        validateDoneButton();
+        colorScroller.scrollTo(button.tag)
+        partColor = colorScroller.colorVector[button.tag];
     }
 }
 
@@ -299,20 +306,30 @@ class ColorScrollerView: UIScrollView{
     let SPACE: CGFloat = 100;
     let BUTTON_WIDTH: CGFloat = 22;
     var target: AnyObject!
+    weak var buttonChosed: UIButton?
     var colorVector:[UIColor] = [
         UIColor.blueColor(),
         UIColor.greenColor(),
         UIColor.yellowColor(),
         UIColor.orangeColor(),
-        UIColor.purpleColor()
+        UIColor.grayColor()
     ]
-    func scrollTo(color: UIColor){
-        if let id = colorVector.indexOf(color){
-            let x = SPACE * CGFloat(id) + SPACE / 2
-            self.contentOffset = CGPoint(x: x, y: 0);
-        }else{
-            assert(false)
-        }
+    
+    func scrollTo(id: Int){
+        let centerX = SPACE * CGFloat(id) + SPACE / 2
+        let rect = CGRect(x: centerX - bounds.width/2, y: 0, width: bounds.width, height: self.bounds.height)
+        self.scrollRectToVisible(rect, animated: true)
+        let newbut = self.subviews[id] as! UIButton;
+        UIView.animateWithDuration(0.5, animations: {
+            newbut.layer.borderWidth = 2.0;
+            newbut.layer.borderColor = UIColor.redColor().CGColor;
+            if let but2 = self.buttonChosed{
+                but2.layer.borderWidth  = 0.0
+            }
+        })
+        
+
+        buttonChosed = newbut;
     }
 
     override init(frame: CGRect) {
@@ -321,8 +338,8 @@ class ColorScrollerView: UIScrollView{
         var posiInX = SPACE / 2
         for (var i = 0; i != colorVector.count; ++i){
             let color = colorVector[i]
-            posiInX += SPACE;
             let but = getButtonInColor(color, posi: posiInX)
+            posiInX += SPACE;
             but.tag = i;
             self.addSubview(but)
         }

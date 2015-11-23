@@ -70,6 +70,7 @@ class Part: NSObject, NSCoding, NSMutableCopying{
         //aCoder.encodeObject(endDate, forKey: "endDate")
         aCoder.encodeDouble(begin, forKey: "begin"); // only save time intervals!
         aCoder.encodeDouble(end, forKey: "end");
+        aCoder.encodeObject(color, forKey: "color")
     }
     required init?(coder aDecoder: NSCoder) {
         title = aDecoder.decodeObjectForKey("title") as! String
@@ -79,6 +80,9 @@ class Part: NSObject, NSCoding, NSMutableCopying{
         end = aDecoder.decodeDoubleForKey("end");
         beginDate = NSDate(timeIntervalSinceReferenceDate: begin); //all in GMT timeZone
         endDate = NSDate(timeIntervalSinceReferenceDate: end);
+        if let col = aDecoder.decodeObjectForKey("color") as? UIColor{
+            color = col;
+        }
         super.init();
     }
     //MAKR: - NSMutableCopying
@@ -91,6 +95,7 @@ class Part: NSObject, NSCoding, NSMutableCopying{
         ret.beginDate = self.beginDate;
         ret.end = self.end
         ret.endDate  = self.endDate;
+        ret.color = self.color;
         return ret;
     }
     

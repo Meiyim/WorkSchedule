@@ -13,7 +13,7 @@ class NowVC: UITableViewController {
     weak var dataLib: DataLib!
     weak var scheduleParsor: ScheduleParsor!
     var headerView: NowHeaderView!
-    var tiCache: [NSTimeInterval]!
+    var tiCache: [(NSTimeInterval,UIColor)]!
     var updateTime: NSDate!
     lazy var dateFormatter: NSDateFormatter = { let ret = NSDateFormatter();
         ret.dateFormat = "MM/dd"
@@ -147,32 +147,25 @@ class NowVC: UITableViewController {
             //cell.descrip.text = "not good"
             cell.descrip.text = part.descriptionIn24h
         }
+        cell.colorBar.backgroundColor = part.color
         return cell
     }
 }
 
 extension NowVC: CycleSpinnerViewDelegate{
     func propertyOfNewPartInCycleSpinnerView(cycleSpinnerView: CycleSpinnerView) -> (NSTimeInterval, UIColor) {
-        var color: UIColor!
-        switch(random() % 3){
-        case 0:
-            color = UIColor.blueColor();
-        case 1:
-            color = UIColor.redColor();
-        case 2:
-            color = UIColor.greenColor();
-        default:
-            assert(false)
-        }
-        var len: NSTimeInterval!
+        var ret: (NSTimeInterval,UIColor)!
         if tiCache.isEmpty{
             let date = scheduleParsor.date(NSDate(),afterdays:1);
-            len = scheduleParsor.workForDate(date)?.last
+            let work = scheduleParsor.workForDate(date)!
+            ret = (work.last,work.color);
+            print("providing partInfo from SP")
         }else{
-            len = tiCache[0];
+            ret = tiCache[0]
             tiCache.removeAtIndex(0)
+            print("providing partInfo from cache")
         }
-        return (len,color)
+        return ret
     }
     
 }

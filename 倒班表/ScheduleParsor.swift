@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 enum VacationStyle{
     case Cover
     case Delay
@@ -178,18 +179,18 @@ class ScheduleParsor: NSObject, NSCoding{
         }
         return part;
     }
-    func intervalsWithin25HFrom(date: NSDate) -> [NSTimeInterval]?{
+    func intervalsWithin25HFrom(date: NSDate) -> [(NSTimeInterval,UIColor)]?{
         if !isApplying {return nil;}
         var id = indexPathForDate(date)!
         var part = workForIndexPath(id)!;
         var sum = part.last
-        var ret = [NSTimeInterval]();
-        ret.append(part.last)
+        var ret = [(NSTimeInterval,UIColor)]();
+        ret.append((part.last,part.color))
         while (sum < 25 * 3600){
             id = indexPathAfterIndexPath(id)
             part = workForIndexPath(id)!
             sum += part.last
-            ret.append(part.last)
+            ret.append((part.last,part.color))
         }
         return ret;
     }
